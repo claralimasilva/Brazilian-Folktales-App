@@ -1,0 +1,3297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Folktale Reader - Learn English Through Brazilian Stories</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #228B22 0%, #FF8C00 30%, #32CD32 70%, #DAA520 100%);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+            cursor: url('/static/cursor-leaf.svg') 12 12, auto;
+        }
+        .container-main {
+            background: rgba(255, 248, 220, 0.95);
+            border-radius: 20px;
+            padding: 40px 50px;
+            margin: 20px auto;
+            max-width: 95%;
+            box-shadow: 0 20px 40px rgba(34, 139, 34, 0.2);
+            border: 2px solid rgba(255, 140, 0, 0.3);
+        }
+        .navbar {
+            background: rgba(34, 139, 34, 0.9) !important;
+            backdrop-filter: blur(10px);
+            border-bottom: 2px solid rgba(255, 140, 0, 0.6);
+            transition: all 0.3s ease;
+        }
+        
+        /* Força estado inicial dos menus */
+        #public-menu {
+            display: flex !important;
+        }
+        
+        #user-menu {
+            display: none !important;
+        }
+        
+        /* Quando autenticado, os estilos serão sobrescritos por JavaScript */
+        body.authenticated #public-menu {
+            display: none !important;
+        }
+        
+        body.authenticated #user-menu {
+            display: flex !important;
+        }
+        .navbar-brand {
+            color: white !important;
+            font-weight: bold;
+            font-size: 1.5rem;
+        }
+        .nav-link {
+            color: white !important;
+        }
+        .story-card {
+            background: linear-gradient(145deg, #F0FFF0 0%, #FFF8DC 100%);
+            border-radius: 15px;
+            padding: 30px 35px;
+            margin: 20px 0;
+            box-shadow: 0 5px 20px rgba(34, 139, 34, 0.15);
+            transition: transform 0.3s, box-shadow 0.3s;
+            cursor: url('/static/cursor-flower.svg') 12 12, pointer;
+            border-left: 5px solid #228B22;
+        }
+        .story-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(255, 140, 0, 0.3);
+            border-left-color: #FF8C00;
+        }
+        .chapter-nav {
+            background: linear-gradient(145deg, #F5FFFA 0%, #FFF8DC 100%);
+            border-radius: 15px;
+            padding: 25px 30px;
+            margin: 20px 0;
+            border: 1px solid rgba(255, 140, 0, 0.2);
+        }
+        .chapter-btn {
+            background: linear-gradient(45deg, #228B22, #FF8C00);
+            border: none;
+            border-radius: 25px;
+            padding: 10px 20px;
+            color: white;
+            margin: 5px;
+            transition: all 0.3s;
+            cursor: url('/static/cursor-star.svg') 10 10, pointer;
+        }
+        .chapter-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(34, 139, 34, 0.4);
+        }
+        .chapter-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        .chapter-btn.completed {
+            background: linear-gradient(45deg, #32CD32, #228B22);
+        }
+        
+        /* Cursores personalizados para diferentes elementos */
+        button, .btn {
+            cursor: url('/static/cursor-star.svg') 10 10, pointer;
+        }
+        
+        a, .clickable {
+            cursor: url('/static/cursor-flower.svg') 12 12, pointer;
+        }
+        
+        input, textarea, select {
+            cursor: url('/static/cursor-leaf.svg') 12 12, text;
+        }
+        
+        .quiz-option {
+            cursor: url('/static/cursor-star.svg') 10 10, pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .quiz-option:hover {
+            transform: scale(1.02);
+            box-shadow: 0 5px 15px rgba(255, 140, 0, 0.3);
+        }
+        
+        .nav-link {
+            cursor: url('/static/cursor-flower.svg') 12 12, pointer;
+        }
+        
+        /* Efeito hover especial para elementos clicáveis */
+        .story-card:hover, .chapter-btn:hover, .quiz-option:hover {
+            filter: brightness(1.05);
+        }
+        
+        /* Cursor especial para área de leitura */
+        .reading-area {
+            cursor: url('/static/cursor-leaf.svg') 12 12, auto;
+        }
+        
+        /* Estilos para seção de administração */
+        .admin-section {
+            margin-bottom: 30px;
+        }
+        
+        .admin-card {
+            background: linear-gradient(145deg, #F5FFFA 0%, #FFF8DC 100%);
+            border-radius: 15px;
+            padding: 30px 35px;
+            margin: 20px 0;
+            border: 1px solid rgba(255, 140, 0, 0.2);
+            box-shadow: 0 5px 15px rgba(34, 139, 34, 0.1);
+        }
+        
+        .admin-buttons {
+            margin-top: 15px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .admin-buttons .btn {
+            border-radius: 25px;
+            padding: 10px 20px;
+            border: none;
+            transition: all 0.3s;
+        }
+        
+        .btn-info {
+            background: linear-gradient(45deg, #17a2b8, #20c997);
+            color: white;
+        }
+        
+        .btn-warning {
+            background: linear-gradient(45deg, #ffc107, #fd7e14);
+            color: white;
+        }
+        
+        .btn-success {
+            background: linear-gradient(45deg, #28a745, #20c997);
+            color: white;
+        }
+        
+        .admin-buttons .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .instructions {
+            background: rgba(255, 248, 220, 0.7);
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 4px solid #228B22;
+        }
+        
+        .instructions h6 {
+            color: #2F4F2F;
+            font-weight: bold;
+            margin-top: 15px;
+            margin-bottom: 10px;
+        }
+        
+        .instructions ol, .instructions ul {
+            color: #2F4F2F;
+        }
+        
+        .instructions code {
+            background: rgba(34, 139, 34, 0.1);
+            padding: 2px 6px;
+            border-radius: 4px;
+            color: #2F4F2F;
+            font-weight: bold;
+        }
+        
+        #data-status {
+            background: rgba(255, 255, 255, 0.8);
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            border: 1px solid rgba(34, 139, 34, 0.2);
+        }
+        
+        .status-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(34, 139, 34, 0.1);
+        }
+        
+        .status-item:last-child {
+            border-bottom: none;
+        }
+        
+        .status-label {
+            font-weight: bold;
+            color: #2F4F2F;
+        }
+        
+        .status-value {
+            color: #228B22;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .status-success {
+            color: #28a745 !important;
+        }
+        
+        .status-warning {
+            color: #ffc107 !important;
+        }
+        
+        .status-error {
+            color: #dc3545 !important;
+        }
+        
+        /* Estilos para sistema de login */
+        .admin-user-info {
+            background: rgba(255, 248, 220, 0.8);
+            padding: 10px 15px;
+            border-radius: 15px;
+            border: 1px solid rgba(34, 139, 34, 0.3);
+            text-align: right;
+        }
+        
+        .admin-user-info span {
+            color: #228B22;
+            font-weight: bold;
+        }
+        
+        .admin-user-info small {
+            display: block;
+            font-size: 0.8rem;
+        }
+        
+        #login-link, #logout-link {
+            transition: all 0.3s ease;
+        }
+        
+        .modal-content {
+            box-shadow: 0 20px 40px rgba(34, 139, 34, 0.3);
+        }
+        
+        .form-control:focus {
+            border-color: #228B22 !important;
+            box-shadow: 0 0 0 0.2rem rgba(34, 139, 34, 0.25) !important;
+        }
+        
+        .protected-content {
+            opacity: 0.3;
+            pointer-events: none;
+            transition: all 0.3s ease;
+        }
+        
+        .protected-content.unlocked {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        
+        /* Estilos para perfil do usuário */
+        .user-section {
+            margin-bottom: 30px;
+        }
+        
+        .user-card {
+            background: linear-gradient(145deg, #F5FFFA 0%, #FFF8DC 100%);
+            border-radius: 15px;
+            padding: 25px;
+            margin: 15px 0;
+            border: 1px solid rgba(255, 140, 0, 0.2);
+            box-shadow: 0 5px 15px rgba(34, 139, 34, 0.1);
+        }
+        
+        .user-info-form .form-label {
+            color: #2F4F2F;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+        
+        .user-info-form .form-control {
+            border: 2px solid rgba(34, 139, 34, 0.3);
+            border-radius: 10px;
+            padding: 10px 15px;
+        }
+        
+        .user-info-form .form-control:focus {
+            border-color: #228B22;
+            box-shadow: 0 0 0 0.2rem rgba(34, 139, 34, 0.25);
+        }
+        
+        .user-avatar-section {
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .user-avatar {
+            font-size: 80px;
+            color: #228B22;
+            margin-bottom: 15px;
+        }
+        
+        .user-level-badge {
+            background: linear-gradient(45deg, #228B22, #32CD32);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            display: inline-block;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+        
+        .user-streak {
+            background: linear-gradient(45deg, #FF8C00, #FFB84D);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            display: inline-block;
+            font-weight: bold;
+        }
+        
+        .preference-item {
+            margin-bottom: 20px;
+        }
+        
+        .speed-display {
+            text-align: center;
+            color: #2F4F2F;
+            font-weight: bold;
+            margin-top: 5px;
+        }
+        
+        .form-range::-webkit-slider-thumb {
+            background: #228B22;
+        }
+        
+        .form-range::-moz-range-thumb {
+            background: #228B22;
+            border: none;
+        }
+        
+        .goal-item {
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .goal-item h6 {
+            color: #2F4F2F;
+            margin-bottom: 15px;
+        }
+        
+        .progress-circle {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: conic-gradient(#228B22 0deg 0deg, #e0e0e0 0deg 360deg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 10px;
+            position: relative;
+        }
+        
+        .progress-circle::before {
+            content: '';
+            width: 60px;
+            height: 60px;
+            background: white;
+            border-radius: 50%;
+            position: absolute;
+        }
+        
+        .progress-text {
+            position: relative;
+            z-index: 1;
+            font-weight: bold;
+            color: #2F4F2F;
+        }
+        
+        .goal-description {
+            color: #666;
+            font-size: 0.9rem;
+            margin: 0;
+        }
+        
+        .vocabulary-stats {
+            background: rgba(255, 248, 220, 0.7);
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .vocab-stat {
+            text-align: center;
+            padding: 10px;
+        }
+        
+        .vocab-number {
+            display: block;
+            font-size: 2rem;
+            font-weight: bold;
+            color: #228B22;
+        }
+        
+        .vocab-label {
+            display: block;
+            color: #2F4F2F;
+            font-size: 0.9rem;
+        }
+        
+        .vocabulary-actions {
+            text-align: center;
+        }
+        
+        .vocabulary-actions .btn {
+            margin: 0 10px 10px 0;
+            border-radius: 25px;
+            padding: 10px 20px;
+        }
+        .reading-area {
+            background: linear-gradient(145deg, #F5FFFA 0%, #FFF8DC 100%);
+            border-radius: 15px;
+            padding: 30px;
+            line-height: 1.8;
+            font-size: 1.1rem;
+            color: #2F4F2F;
+            box-shadow: 0 10px 30px rgba(34, 139, 34, 0.1);
+            border: 1px solid rgba(255, 140, 0, 0.2);
+        }
+        .audio-controls {
+            background: linear-gradient(145deg, #F0FFF0 0%, #FFFACD 100%);
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            margin: 20px 0;
+            border: 1px solid rgba(34, 139, 34, 0.2);
+        }
+        .quiz-container {
+            background: linear-gradient(145deg, #F5FFFA 0%, #FFF8DC 100%);
+            border-radius: 15px;
+            padding: 25px;
+            margin: 20px 0;
+            box-shadow: 0 5px 20px rgba(34, 139, 34, 0.1);
+            border: 1px solid rgba(255, 140, 0, 0.2);
+        }
+        .quiz-option {
+            background: linear-gradient(145deg, #F0FFF0 0%, #FFFACD 100%);
+            border: 2px solid #90EE90;
+            border-radius: 10px;
+            padding: 15px;
+            margin: 10px 0;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .quiz-option:hover {
+            border-color: #228B22;
+            background: linear-gradient(145deg, #228B22 0%, #FF8C00 100%);
+            color: white;
+            transform: translateX(5px);
+        }
+        .quiz-option.correct {
+            background: linear-gradient(145deg, #32CD32 0%, #228B22 100%);
+            border-color: #228B22;
+            color: white;
+        }
+        .quiz-option.incorrect {
+            background: linear-gradient(145deg, #FF6347 0%, #DC143C 100%);
+            border-color: #DC143C;
+            color: white;
+        }
+        .progress-bar {
+            background: linear-gradient(45deg, #228B22, #FF8C00);
+            border-radius: 10px;
+        }
+        .text-primary {
+            color: #2F4F2F !important;
+        }
+        .badge {
+            background: linear-gradient(45deg, #228B22, #FF8C00) !important;
+        }
+        .stats-card {
+            background: linear-gradient(145deg, #F0FFF0 0%, #FFF8DC 100%);
+            border-radius: 15px;
+            padding: 20px;
+            margin: 10px 0;
+            border-left: 4px solid #228B22;
+            box-shadow: 0 3px 10px rgba(34, 139, 34, 0.1);
+        }
+        .badge-item {
+            background: linear-gradient(45deg, #228B22, #FF8C00);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            margin: 5px;
+            display: inline-block;
+            font-size: 0.9em;
+        }
+        .loading {
+            text-align: center;
+            padding: 50px;
+        }
+        .spinner-border {
+            color: #228B22;
+        }
+        .btn-primary {
+            background: linear-gradient(45deg, #228B22, #FF8C00);
+            border: none;
+            border-radius: 25px;
+            padding: 10px 25px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(34, 139, 34, 0.4);
+            background: linear-gradient(45deg, #32CD32, #FFB347);
+        }
+        .btn-success {
+            background: linear-gradient(45deg, #32CD32, #228B22);
+            border: none;
+        }
+        .btn-warning {
+            background: linear-gradient(45deg, #FF8C00, #DAA520);
+            border: none;
+        }
+        .btn-info {
+            background: linear-gradient(45deg, #20B2AA, #4682B4);
+            border: none;
+        }
+        .vocabulary-container {
+            background: linear-gradient(145deg, #F0FFF0 0%, #FFF8DC 100%);
+            border-radius: 15px;
+            padding: 25px;
+            margin: 20px 0;
+            box-shadow: 0 5px 20px rgba(34, 139, 34, 0.1);
+            border: 1px solid rgba(255, 140, 0, 0.2);
+        }
+        .vocabulary-card {
+            background: linear-gradient(145deg, #F5FFFA 0%, #FFFACD 100%);
+            border-left: 4px solid #228B22;
+            border-radius: 0 10px 10px 0;
+            padding: 15px;
+            margin: 10px 0;
+            box-shadow: 0 2px 8px rgba(255, 140, 0, 0.1);
+            transition: transform 0.2s;
+        }
+        .vocabulary-card:hover {
+            transform: translateX(5px);
+        }
+        .vocabulary-word {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #2F4F2F;
+            margin-bottom: 5px;
+        }
+        .vocabulary-translation {
+            font-size: 1.1em;
+            color: #FF8C00;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        .vocabulary-context {
+            font-size: 0.9em;
+            color: #556B2F;
+            font-style: italic;
+            line-height: 1.4;
+        }
+
+        /* Welcome Page Styles */
+        #welcome-page {
+            min-height: 100vh;
+            display: block;
+        }
+
+        .welcome-hero {
+            padding: 60px 40px;
+            background: linear-gradient(135deg, #2d5016 0%, #4a7c59 100%);
+            border-radius: 15px;
+            margin-bottom: 40px;
+            color: white;
+        }
+
+        .welcome-title {
+            font-size: 3rem;
+            font-weight: bold;
+            margin-bottom: 25px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            padding-left: 20px;
+        }
+
+        .welcome-subtitle {
+            font-size: 1.3rem;
+            margin-bottom: 35px;
+            opacity: 0.9;
+            padding-left: 20px;
+        }
+
+        .welcome-features {
+            margin-bottom: 35px;
+            padding-left: 20px;
+        }
+
+        .feature-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 12px;
+            font-size: 1.1rem;
+            padding-left: 10px;
+        }
+
+        .feature-item i {
+            margin-right: 15px;
+            color: #ffd700;
+            width: 20px;
+        }
+
+        .welcome-actions {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            padding-left: 20px;
+        }
+
+        .welcome-btn {
+            border-radius: 25px;
+            padding: 12px 30px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .welcome-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+
+        .welcome-image {
+            text-align: center;
+            padding: 40px 30px;
+        }
+
+        .image-placeholder {
+            background: rgba(255,255,255,0.1);
+            border-radius: 15px;
+            padding: 60px 30px;
+            border: 2px dashed rgba(255,255,255,0.3);
+            margin: 20px;
+        }
+
+        .image-placeholder i {
+            font-size: 4rem;
+            color: #90ee90;
+            margin-bottom: 20px;
+        }
+
+        .how-it-works {
+            padding: 60px 40px;
+            background: #f8f9fa;
+            border-radius: 15px;
+            margin: 40px 0;
+        }
+
+        .how-it-works h2 {
+            text-align: center;
+            margin-bottom: 50px;
+            color: #2d5016;
+            font-weight: bold;
+            padding: 0 20px;
+        }
+
+        .step-card {
+            text-align: center;
+            padding: 35px 25px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            margin: 25px 10px;
+            transition: transform 0.3s ease;
+            position: relative;
+        }
+
+        .step-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .step-number {
+            position: absolute;
+            top: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #4a7c59;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        .step-icon {
+            font-size: 3rem;
+            color: #4a7c59;
+            margin-top: 20px;
+        }
+
+        .demo-stories {
+            margin-bottom: 40px;
+        }
+
+        .demo-stories h2 {
+            color: #2d5016;
+            margin-bottom: 30px;
+            font-weight: bold;
+        }
+
+        .sample-chapter {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 40px;
+            margin-bottom: 40px;
+        }
+
+        .sample-chapter h2 {
+            color: #2d5016;
+            margin-bottom: 30px;
+            font-weight: bold;
+        }
+
+        .sample-content {
+            background: white;
+            border-radius: 10px;
+            padding: 30px;
+            border-left: 5px solid #4a7c59;
+            margin-bottom: 20px;
+        }
+
+        .sample-note {
+            color: #666;
+            font-style: italic;
+            margin-bottom: 20px;
+        }
+
+        .login-info {
+            background: linear-gradient(135deg, #e8f5e8 0%, #f0f8f0 100%);
+            border-radius: 15px;
+            padding: 40px;
+            margin-bottom: 40px;
+        }
+
+        .login-info h3 {
+            color: #2d5016;
+            margin-bottom: 30px;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .credentials-card {
+            background: white;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+
+        .credentials-card h5 {
+            color: #4a7c59;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+
+        .credentials-card i {
+            margin-right: 8px;
+        }
+
+        /* Story Card Styles for Demo */
+        .story-card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            padding: 25px;
+            margin-bottom: 20px;
+            transition: transform 0.3s ease;
+        }
+
+        .story-card:hover {
+            transform: translateY(-3px);
+        }
+
+        .story-card h5 {
+            color: #2d5016;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        .story-card .story-description {
+            color: #666;
+            margin-bottom: 15px;
+        }
+
+        .story-card .story-stats {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.9rem;
+            color: #888;
+        }
+
+        /* Navigation States */
+        .nav-item.public-only {
+            display: block;
+        }
+
+        .nav-item.auth-only {
+            display: none;
+        }
+
+        body.authenticated .nav-item.public-only {
+            display: none;
+        }
+
+        body.authenticated .nav-item.auth-only {
+            display: block;
+        }
+
+        /* Page visibility */
+        .page-section {
+            display: none;
+        }
+
+        .page-section.active {
+            display: block;
+        }
+
+        /* Responsive Welcome Page */
+        @media (max-width: 768px) {
+            .welcome-title {
+                font-size: 2rem;
+            }
+            
+            .welcome-actions {
+                justify-content: center;
+            }
+            
+            .step-card {
+                margin-bottom: 40px;
+            }
+            
+            .welcome-hero {
+                padding: 40px 0;
+            }
+        }
+
+        /* Ranking Page Styles */
+        .ranking-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            border: 2px solid rgba(255, 140, 0, 0.3);
+            box-shadow: 0 8px 16px rgba(34, 139, 34, 0.1);
+        }
+
+        .current-user-rank {
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.1), rgba(255, 140, 0, 0.1));
+            border: 2px solid rgba(255, 215, 0, 0.5);
+        }
+
+        .user-rank-display {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .rank-badge {
+            background: linear-gradient(135deg, #FFD700, #FF8C00);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 50%;
+            font-size: 1.2rem;
+            font-weight: bold;
+            min-width: 80px;
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(255, 140, 0, 0.3);
+        }
+
+        .rank-details {
+            flex: 1;
+        }
+
+        .rank-name {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #2d5016;
+        }
+
+        .rank-points {
+            font-size: 1rem;
+            color: #228B22;
+        }
+
+        .ranking-list {
+            max-height: 600px;
+            overflow-y: auto;
+        }
+
+        .ranking-item {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            margin-bottom: 10px;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 10px;
+            border-left: 4px solid #228B22;
+            transition: all 0.3s ease;
+        }
+
+        .ranking-item:hover {
+            background: rgba(255, 248, 220, 0.9);
+            transform: translateX(5px);
+        }
+
+        .ranking-item.top-3 {
+            border-left: 4px solid #FFD700;
+            background: linear-gradient(90deg, rgba(255, 215, 0, 0.1), rgba(255, 255, 255, 0.8));
+        }
+
+        .ranking-item.current-user {
+            border-left: 4px solid #FF8C00;
+            background: linear-gradient(90deg, rgba(255, 140, 0, 0.1), rgba(255, 255, 255, 0.8));
+            font-weight: bold;
+        }
+
+        .rank-position {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #228B22;
+            min-width: 50px;
+            text-align: center;
+        }
+
+        .rank-position.gold { color: #FFD700; }
+        .rank-position.silver { color: #C0C0C0; }
+        .rank-position.bronze { color: #CD7F32; }
+
+        .rank-user-info {
+            flex: 1;
+            margin-left: 15px;
+        }
+
+        .rank-username {
+            font-size: 1.1rem;
+            color: #2d5016;
+            margin-bottom: 5px;
+        }
+
+        .rank-stats {
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .rank-score {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #FF8C00;
+            text-align: right;
+            min-width: 80px;
+        }
+
+        .ranking-controls {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .category-tabs {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            margin-bottom: 15px;
+        }
+
+        .category-tab {
+            background: rgba(34, 139, 34, 0.1);
+            border: 1px solid rgba(34, 139, 34, 0.3);
+            border-radius: 20px;
+            padding: 8px 12px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .category-tab:hover {
+            background: rgba(34, 139, 34, 0.2);
+        }
+
+        .category-tab.active {
+            background: #228B22;
+            color: white;
+            border-color: #228B22;
+        }
+
+        .mini-ranking-list {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .mini-ranking-item {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            margin-bottom: 8px;
+            background: rgba(255, 255, 255, 0.6);
+            border-radius: 8px;
+            font-size: 0.9rem;
+        }
+
+        .mini-rank-pos {
+            font-weight: bold;
+            color: #228B22;
+            min-width: 30px;
+        }
+
+        .mini-rank-name {
+            flex: 1;
+            margin-left: 10px;
+            color: #2d5016;
+        }
+
+        .mini-rank-points {
+            color: #FF8C00;
+            font-weight: bold;
+        }
+
+        .points-info {
+            background: rgba(255, 248, 220, 0.8);
+            border-radius: 10px;
+            padding: 15px;
+        }
+
+        .point-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(34, 139, 34, 0.1);
+        }
+
+        .point-item:last-child {
+            border-bottom: none;
+        }
+
+        .point-value {
+            background: linear-gradient(135deg, #228B22, #32CD32);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        .point-desc {
+            color: #666;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- Achievement Notifications Container -->
+    <div id="achievement-notifications" style="position: fixed; top: 20px; right: 20px; z-index: 9999; max-width: 350px;"></div>
+    
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" href="#" onclick="showWelcome()">
+                <i class="fas fa-book-open"></i> Folktale Reader
+            </a>
+            
+            <!-- Menu for non-logged users -->
+            <div class="navbar-nav ms-auto d-flex flex-row" id="public-menu">
+                <a class="nav-link me-3" href="#" onclick="showWelcome()">
+                    <i class="fas fa-home"></i> Home
+                </a>
+                <a class="nav-link" href="#" onclick="showPublicLogin()">
+                    <i class="fas fa-sign-in-alt"></i> Login
+                </a>
+            </div>
+            
+            <!-- Menu for logged users -->
+            <div class="navbar-nav ms-auto d-flex flex-row" id="user-menu" style="display: none !important;">
+                <a class="nav-link me-3" href="#" onclick="showHome()">
+                    <i class="fas fa-home"></i> Stories
+                </a>
+                <a class="nav-link me-3" href="#" onclick="showStatistics()">
+                    <i class="fas fa-chart-bar"></i> Statistics
+                </a>
+                <a class="nav-link me-3" href="#" onclick="showRanking()">
+                    <i class="fas fa-trophy"></i> Ranking
+                </a>
+                <a class="nav-link me-3" href="#" onclick="showUserProfile()">
+                    <i class="fas fa-user"></i> Profile
+                </a>
+                <a class="nav-link me-3" href="#" onclick="showAdmin()" id="admin-link" style="display: none;">
+                    <i class="fas fa-cog"></i> Admin
+                </a>
+                <a class="nav-link me-3" href="#" onclick="doLogout()" id="logout-link">
+                    <i class="fas fa-sign-out-alt"></i> Logout (<span id="current-username">user</span>)
+                </a>
+                <div class="dropdown d-inline-block">
+                    <a class="nav-link dropdown-toggle" href="#" id="cursorDropdown" role="button" data-bs-toggle="dropdown">
+                        <i class="fas fa-mouse-pointer"></i> Cursor
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="#" onclick="changeCursor('leaf')">🌿 Leaf</a></li>
+                        <li><a class="dropdown-item" href="#" onclick="changeCursor('flower')">🌸 Flower</a></li>
+                        <li><a class="dropdown-item" href="#" onclick="changeCursor('star')">⭐ Star</a></li>
+                        <li><a class="dropdown-item" href="#" onclick="changeCursor('magic')">✨ Mágico</a></li>
+                        <li><a class="dropdown-item" href="#" onclick="changeCursor('default')">🖱️ Padrão</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="container-main">
+            
+            <!-- Welcome Page (Public) -->
+            <div id="welcome-page">
+                <div class="row">
+                    <div class="col-12">
+                        <!-- Hero Section -->
+                        <div class="welcome-hero">
+                            <div class="row align-items-center">
+                                <div class="col-lg-6">
+                                    <h1 class="welcome-title">
+                                        <i class="fas fa-book-open"></i>
+                                        Welcome to Folktale Reader
+                                    </h1>
+                                    <p class="welcome-subtitle">
+                                        Learn English through fascinating Brazilian folktales
+                                    </p>
+                                    <div class="welcome-features">
+                                        <div class="feature-item">
+                                            <i class="fas fa-headphones"></i>
+                                            <span>Native English audio</span>
+                                        </div>
+                                        <div class="feature-item">
+                                            <i class="fas fa-gamepad"></i>
+                                            <span>Interactive quizzes</span>
+                                        </div>
+                                        <div class="feature-item">
+                                            <i class="fas fa-trophy"></i>
+                                            <span>Progress tracking</span>
+                                        </div>
+                                        <div class="feature-item">
+                                            <i class="fas fa-book"></i>
+                                            <span>Contextual vocabulary</span>
+                                        </div>
+                                    </div>
+                                    <div class="welcome-actions">
+                                        <button class="btn btn-lg btn-primary welcome-btn" onclick="showPublicLogin()">
+                                            <i class="fas fa-play"></i> Start Now
+                                        </button>
+                                        <button class="btn btn-lg btn-outline-secondary welcome-btn" onclick="scrollToDemo()">
+                                            <i class="fas fa-eye"></i> View Demo
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6">
+                                    <div class="welcome-image">
+                                        <div class="image-placeholder">
+                                            <i class="fas fa-forest"></i>
+                                            <p>Stories from the Amazon Forest</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- How It Works Section -->
+                        <div class="how-it-works" id="demo-section">
+                            <h2><i class="fas fa-cogs"></i> How It Works</h2>
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="step-card">
+                                        <div class="step-number">1</div>
+                                        <h4>Choose a Story</h4>
+                                        <p>Select from various Brazilian folktales adapted for English learning.</p>
+                                        <i class="fas fa-book-reader step-icon"></i>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="step-card">
+                                        <div class="step-number">2</div>
+                                        <h4>Read and Listen</h4>
+                                        <p>Follow the English text with native audio. Learn contextual vocabulary.</p>
+                                        <i class="fas fa-volume-up step-icon"></i>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="step-card">
+                                        <div class="step-number">3</div>
+                                        <h4>Test Your Knowledge</h4>
+                                        <p>Answer quizzes to check your comprehension and advance to the next chapter.</p>
+                                        <i class="fas fa-question-circle step-icon"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Demo Stories Section (hidden by default) -->
+                        <div class="demo-stories" style="display: none;">
+                            <h2><i class="fas fa-star"></i> Available Stories</h2>
+                            <div class="row" id="demo-stories-container">
+                                <!-- Will be filled dynamically -->
+                            </div>
+                        </div>
+
+                        <!-- Sample Chapter -->
+                        <div class="sample-chapter">
+                            <h2><i class="fas fa-eye"></i> Sample Chapter</h2>
+                            <div class="sample-content" id="sample-content">
+                                <!-- Will be filled dynamically -->
+                            </div>
+                            <div class="text-center mt-4">
+                                <p class="sample-note">
+                                    <i class="fas fa-lock"></i>
+                                    To access the complete content, vocabulary and quizzes, please login
+                                </p>
+                                <button class="btn btn-primary btn-lg" onclick="showPublicLogin()">
+                                    <i class="fas fa-sign-in-alt"></i> Login
+                                </button>
+                            </div>
+                        </div>                        <!-- Demo Account Information -->
+                        <div class="login-info">
+                            <h3><i class="fas fa-info-circle"></i> Demo Account Information</h3>
+                            <div class="row">
+                                <div class="col-12">
+                                    <div class="credentials-card text-center">
+                                        <h5><i class="fas fa-user"></i> Demo Account</h5>
+                                        <p><strong>Username:</strong> demo<br><strong>Password:</strong> demo123</p>
+                                        <p class="text-muted mt-3">
+                                            <i class="fas fa-graduation-cap"></i>
+                                            Perfect for trying out the learning experience!
+                                        </p>
+                                        <small class="text-info">
+                                            <i class="fas fa-shield-alt"></i>
+                                            This is a demonstration account with limited features.
+                                        </small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Home Page (Authenticated Users) -->
+            <div id="home-page">
+                <div class="text-center mb-5">
+                    <h1 class="display-4 text-primary mb-3">
+                        <i class="fas fa-book-reader"></i> Folktale Reader
+                    </h1>
+                    <p class="lead text-muted">Learn English through enchanting Brazilian folktales</p>
+                    <p class="text-muted">Read stories chapter by chapter, listen to audio, and test your comprehension</p>
+                </div>
+
+                <div id="stories-container" class="loading">
+                    <div class="spinner-border" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <p>Loading folktales...</p>
+                </div>
+            </div>
+
+            <!-- Story Reading Page -->
+            <div id="story-page" style="display: none;">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <h2 id="story-title" class="text-primary"></h2>
+                            <button class="btn btn-outline-secondary" onclick="showHome()">
+                                <i class="fas fa-arrow-left"></i> Back to Stories
+                            </button>
+                        </div>
+                        
+                        <!-- Chapter Navigation -->
+                        <div id="chapter-nav" class="chapter-nav">
+                            <h5 class="text-primary mb-3">
+                                <i class="fas fa-list"></i> Chapters
+                            </h5>
+                            <div id="chapter-buttons"></div>
+                        </div>
+                        
+                        <!-- Chapter Content -->
+                        <div id="chapter-content" style="display: none;">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h4 id="chapter-title" class="text-primary"></h4>
+                                <div>
+                                    <button class="btn btn-warning btn-sm me-2" onclick="showVocabulary()">
+                                        <i class="fas fa-bookmark"></i> Vocabulary
+                                    </button>
+                                    <button class="btn btn-info btn-sm me-2" onclick="playAudio()">
+                                        <i class="fas fa-play"></i> Listen
+                                    </button>
+                                    <button class="btn btn-success btn-sm" onclick="startQuiz()">
+                                        <i class="fas fa-question-circle"></i> Take Quiz
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <div id="story-text" class="reading-area mb-4"></div>
+                            
+                            <!-- Audio Controls -->
+                            <div id="audio-controls" class="audio-controls" style="display: none;">
+                                <h5><i class="fas fa-headphones"></i> Audio Player</h5>
+                                <audio id="story-audio" controls style="width: 100%;">
+                                    Your browser does not support the audio element.
+                                </audio>
+                                <p class="mt-2 text-muted">Listen to the chapter while reading along</p>
+                            </div>
+                            
+                            <!-- Vocabulary Section -->
+                            <div id="vocabulary-section" style="display: none;">
+                                <div class="vocabulary-container">
+                                    <h5 class="text-primary mb-4">
+                                        <i class="fas fa-bookmark"></i> Chapter Vocabulary
+                                    </h5>
+                                    <p class="text-muted mb-3">Key words from this chapter with translations</p>
+                                    <div id="vocabulary-content"></div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Quiz Section -->
+                        <div id="quiz-section" style="display: none;">
+                            <div class="quiz-container">
+                                <h4 class="text-primary mb-4">
+                                    <i class="fas fa-question-circle"></i> Chapter Quiz
+                                </h4>
+                                <div id="quiz-content"></div>
+                            </div>
+                        </div>
+                        
+                        <!-- Quiz Results -->
+                        <div id="quiz-results" style="display: none;">
+                            <div class="quiz-container">
+                                <div class="text-center">
+                                    <h4 class="text-primary mb-4">Quiz Results</h4>
+                                    <div id="quiz-score" class="display-4 mb-3"></div>
+                                    <div id="quiz-message" class="mb-4"></div>
+                                    <div id="quiz-actions"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Statistics Page -->
+            <div id="statistics-page" style="display: none;">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h2 class="text-primary">
+                        <i class="fas fa-chart-bar"></i> Your Learning Statistics
+                    </h2>
+                    <button class="btn btn-outline-secondary" onclick="showHome()">
+                        <i class="fas fa-arrow-left"></i> Back to Home
+                    </button>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="stats-card">
+                            <h5><i class="fas fa-book"></i> Story Progress</h5>
+                            <div id="story-stats"></div>
+                        </div>
+                        
+                        <div class="stats-card">
+                            <h5><i class="fas fa-brain"></i> Quiz Performance</h5>
+                            <div id="quiz-stats"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="stats-card">
+                            <h5><i class="fas fa-trophy"></i> Achievements</h5>
+                            <div id="badges-container"></div>
+                        </div>
+                        
+                        <div class="stats-card">
+                            <h5><i class="fas fa-history"></i> Recent Activity</h5>
+                            <div id="recent-activity"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- User Profile Page -->
+    <div class="container-main" id="user-profile-page" style="display: none;">
+        <div class="row">
+            <div class="col-12">
+                <h2><i class="fas fa-user"></i> Meu Perfil de Aprendizado</h2>
+                
+                <!-- User Info Section -->
+                <div class="user-section">
+                    <h4><i class="fas fa-id-card"></i> Informações Pessoais</h4>
+                    <div class="user-card">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="user-info-form">
+                                    <div class="mb-3">
+                                        <label class="form-label">Nome:</label>
+                                        <input type="text" class="form-control" id="user-name" placeholder="Digite seu nome">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Nível de Inglês:</label>
+                                        <select class="form-control" id="user-level">
+                                            <option value="beginner">Iniciante</option>
+                                            <option value="elementary">Básico</option>
+                                            <option value="intermediate">Intermediário</option>
+                                            <option value="advanced">Avançado</option>
+                                        </select>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Meta de Estudo:</label>
+                                        <select class="form-control" id="user-goal">
+                                            <option value="casual">Casual (1-2 histórias/semana)</option>
+                                            <option value="regular">Regular (3-4 histórias/semana)</option>
+                                            <option value="intensive">Intensivo (1 história/dia)</option>
+                                        </select>
+                                    </div>
+                                    <button class="btn btn-primary" onclick="saveUserProfile()">
+                                        <i class="fas fa-save"></i> Salvar Perfil
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="user-avatar-section">
+                                    <div class="user-avatar" id="user-avatar">
+                                        <i class="fas fa-user-circle"></i>
+                                    </div>
+                                    <div class="user-level-badge" id="user-level-display">
+                                        <span>Nível: Não definido</span>
+                                    </div>
+                                    <div class="user-streak" id="user-streak">
+                                        <i class="fas fa-fire"></i> Sequência: 0 dias
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Learning Preferences -->
+                <div class="user-section">
+                    <h4><i class="fas fa-sliders-h"></i> Preferências de Aprendizado</h4>
+                    <div class="user-card">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="preference-item">
+                                    <label class="form-label">Velocidade de Áudio:</label>
+                                    <input type="range" class="form-range" id="audio-speed" min="0.5" max="2" step="0.1" value="1">
+                                    <div class="speed-display">Velocidade: <span id="speed-value">1.0x</span></div>
+                                </div>
+                                <div class="preference-item">
+                                    <label class="form-label">Tema Visual:</label>
+                                    <select class="form-control" id="theme-preference">
+                                        <option value="forest">Floresta (padrão)</option>
+                                        <option value="ocean">Oceano</option>
+                                        <option value="sunset">Pôr do Sol</option>
+                                        <option value="classic">Clássico</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="preference-item">
+                                    <label class="form-label">Modo de Quiz:</label>
+                                    <select class="form-control" id="quiz-mode">
+                                        <option value="normal">Normal (70% para passar)</option>
+                                        <option value="easy">Fácil (60% para passar)</option>
+                                        <option value="hard">Difícil (80% para passar)</option>
+                                    </select>
+                                </div>
+                                <div class="preference-item">
+                                    <label class="form-label">Notificações:</label>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="daily-reminder">
+                                        <label class="form-check-label">Lembrete diário de estudo</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="achievement-notifications">
+                                        <label class="form-check-label">Notificações de conquistas</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <button class="btn btn-success mt-3" onclick="saveUserPreferences()">
+                            <i class="fas fa-check"></i> Salvar Preferências
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Learning Goals and Progress -->
+                <div class="user-section">
+                    <h4><i class="fas fa-target"></i> Metas e Progresso</h4>
+                    <div class="user-card">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="goal-item">
+                                    <h6><i class="fas fa-book"></i> Histórias Lidas</h6>
+                                    <div class="progress-circle" id="stories-progress">
+                                        <span class="progress-text">0/10</span>
+                                    </div>
+                                    <p class="goal-description">Meta mensal</p>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="goal-item">
+                                    <h6><i class="fas fa-trophy"></i> Quizzes Perfeitos</h6>
+                                    <div class="progress-circle" id="perfect-quiz-progress">
+                                        <span class="progress-text">0/5</span>
+                                    </div>
+                                    <p class="goal-description">Meta mensal</p>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="goal-item">
+                                    <h6><i class="fas fa-calendar"></i> Dias Consecutivos</h6>
+                                    <div class="progress-circle" id="streak-progress">
+                                        <span class="progress-text">0/7</span>
+                                    </div>
+                                    <p class="goal-description">Meta semanal</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Vocabulary Review -->
+                <div class="user-section">
+                    <h4><i class="fas fa-language"></i> Revisão de Vocabulário</h4>
+                    <div class="user-card">
+                        <div class="vocabulary-stats">
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <div class="vocab-stat">
+                                        <span class="vocab-number" id="total-words">0</span>
+                                        <span class="vocab-label">Palavras Aprendidas</span>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="vocab-stat">
+                                        <span class="vocab-number" id="mastered-words">0</span>
+                                        <span class="vocab-label">Dominadas</span>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="vocab-stat">
+                                        <span class="vocab-number" id="review-words">0</span>
+                                        <span class="vocab-label">Para Revisar</span>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="vocab-stat">
+                                        <span class="vocab-number" id="new-words">0</span>
+                                        <span class="vocab-label">Novas Hoje</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="vocabulary-actions mt-3">
+                            <button class="btn btn-outline-primary" onclick="startVocabReview()">
+                                <i class="fas fa-play"></i> Iniciar Revisão
+                            </button>
+                            <button class="btn btn-outline-success" onclick="exportProgress()">
+                                <i class="fas fa-download"></i> Exportar Progresso
+                            </button>
+                            <button class="btn btn-outline-warning" onclick="resetProgress()">
+                                <i class="fas fa-redo"></i> Resetar Progresso
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Login Modal -->
+    <div class="modal fade" id="loginModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content" style="background: linear-gradient(145deg, #F5FFFA 0%, #FFF8DC 100%); border: 2px solid rgba(255, 140, 0, 0.3);">
+                <div class="modal-header" style="border-bottom: 1px solid rgba(34, 139, 34, 0.2);">
+                    <h5 class="modal-title" style="color: #2F4F2F;"><i class="fas fa-shield-alt"></i> Login de Administrador</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="loginForm">
+                        <div class="mb-3">
+                            <label for="username" class="form-label" style="color: #2F4F2F; font-weight: bold;">Usuário:</label>
+                            <input type="text" class="form-control" id="username" required 
+                                   style="border: 2px solid rgba(34, 139, 34, 0.3); border-radius: 10px;">
+                        </div>
+                        <div class="mb-3">
+                            <label for="password" class="form-label" style="color: #2F4F2F; font-weight: bold;">Senha:</label>
+                            <input type="password" class="form-control" id="password" required
+                                   style="border: 2px solid rgba(34, 139, 34, 0.3); border-radius: 10px;">
+                        </div>
+                        <div id="loginError" class="alert alert-danger" style="display: none; border-radius: 10px;"></div>
+                    </form>
+                </div>
+                <div class="modal-footer" style="border-top: 1px solid rgba(34, 139, 34, 0.2);">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" 
+                            style="border-radius: 25px;">Cancelar</button>
+                    <button type="button" class="btn btn-primary" onclick="doLogin()" 
+                            style="background: linear-gradient(45deg, #228B22, #FF8C00); border: none; border-radius: 25px;">
+                        <i class="fas fa-sign-in-alt"></i> Entrar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Ranking Page -->
+    <div class="container-main" id="ranking-page" style="display: none;">
+        <div class="row">
+            <div class="col-12">
+                <div class="page-header">
+                    <h2><i class="fas fa-trophy"></i> Global Ranking</h2>
+                    <p>Compete with other learners and see who's earning the most achievement points!</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- User's Current Rank -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="ranking-card current-user-rank">
+                    <h4><i class="fas fa-medal"></i> Your Ranking</h4>
+                    <div id="user-rank-info" class="user-rank-display">
+                        <div class="rank-badge">Loading...</div>
+                        <div class="rank-details">
+                            <div class="rank-name">Loading...</div>
+                            <div class="rank-points">Loading...</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Global Leaderboard -->
+        <div class="row">
+            <div class="col-lg-8">
+                <div class="ranking-card">
+                    <h4><i class="fas fa-list-ol"></i> Global Leaderboard</h4>
+                    <div class="ranking-controls mb-3">
+                        <button class="btn btn-outline-primary btn-sm" onclick="loadGlobalRanking(10)">Top 10</button>
+                        <button class="btn btn-outline-primary btn-sm" onclick="loadGlobalRanking(25)">Top 25</button>
+                        <button class="btn btn-outline-primary btn-sm" onclick="loadGlobalRanking(50)">Top 50</button>
+                    </div>
+                    <div id="global-ranking-list" class="ranking-list">
+                        <div class="text-center p-3">
+                            <i class="fas fa-spinner fa-spin"></i> Loading rankings...
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-4">
+                <!-- Category Rankings -->
+                <div class="ranking-card">
+                    <h5><i class="fas fa-tags"></i> Category Leaders</h5>
+                    <div class="category-tabs">
+                        <button class="category-tab active" data-category="reading" onclick="showCategoryRanking('reading')">
+                            <i class="fas fa-book"></i> Reading
+                        </button>
+                        <button class="category-tab" data-category="quiz" onclick="showCategoryRanking('quiz')">
+                            <i class="fas fa-question-circle"></i> Quiz
+                        </button>
+                        <button class="category-tab" data-category="streak" onclick="showCategoryRanking('streak')">
+                            <i class="fas fa-fire"></i> Streak
+                        </button>
+                        <button class="category-tab" data-category="vocabulary" onclick="showCategoryRanking('vocabulary')">
+                            <i class="fas fa-spell-check"></i> Vocab
+                        </button>
+                        <button class="category-tab" data-category="special" onclick="showCategoryRanking('special')">
+                            <i class="fas fa-star"></i> Special
+                        </button>
+                    </div>
+                    <div id="category-ranking-list" class="mini-ranking-list">
+                        <div class="text-center p-2">
+                            <i class="fas fa-spinner fa-spin"></i> Loading...
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Achievement Points Info -->
+                <div class="ranking-card">
+                    <h5><i class="fas fa-info-circle"></i> How Points Work</h5>
+                    <div class="points-info">
+                        <div class="point-item">
+                            <span class="point-value">10-50</span>
+                            <span class="point-desc">Reading achievements</span>
+                        </div>
+                        <div class="point-item">
+                            <span class="point-value">15-75</span>
+                            <span class="point-desc">Quiz achievements</span>
+                        </div>
+                        <div class="point-item">
+                            <span class="point-value">25-100</span>
+                            <span class="point-desc">Streak achievements</span>
+                        </div>
+                        <div class="point-item">
+                            <span class="point-value">20-60</span>
+                            <span class="point-desc">Vocabulary achievements</span>
+                        </div>
+                        <div class="point-item">
+                            <span class="point-value">100-200</span>
+                            <span class="point-desc">Special achievements</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin Page -->
+    <div class="container-main" id="admin-page" style="display: none;">
+        <div class="row">
+            <div class="col-12">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h2><i class="fas fa-cog"></i> Administração do Sistema</h2>
+                    <div id="admin-info" class="admin-user-info">
+                        <span id="admin-username"></span>
+                        <small id="admin-login-time" class="text-muted"></small>
+                    </div>
+                </div>
+                
+                <div class="admin-section">
+                    <h4><i class="fas fa-database"></i> Gerenciamento de Dados</h4>
+                    
+                    <div class="admin-card">
+                        <h5>Status dos Arquivos</h5>
+                        <div id="data-status"></div>
+                        <div class="admin-buttons">
+                            <button class="btn btn-info" onclick="loadDataInfo()">
+                                <i class="fas fa-refresh"></i> Atualizar Status
+                            </button>
+                            <button class="btn btn-warning" onclick="reloadDocx()">
+                                <i class="fas fa-file-word"></i> Reconverter DOCX
+                            </button>
+                            <button class="btn btn-success" onclick="downloadJson()">
+                                <i class="fas fa-download"></i> Baixar JSON
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="admin-card">
+                        <h5>Instruções</h5>
+                        <div class="instructions">
+                            <h6>Como usar o sistema DOCX → JSON:</h6>
+                            <ol>
+                                <li><strong>Edite o arquivo "Brazilian Folktales.docx"</strong> seguindo o formato especificado</li>
+                                <li><strong>Clique em "Reconverter DOCX"</strong> para atualizar o sistema</li>
+                                <li><strong>O sistema automaticamente detecta</strong> se o DOCX foi modificado</li>
+                                <li><strong>O JSON é usado para performance</strong> - carregamento mais rápido</li>
+                            </ol>
+                            
+                            <h6>Arquivos do sistema:</h6>
+                            <ul>
+                                <li><code>Brazilian Folktales.docx</code> - Arquivo fonte editável</li>
+                                <li><code>stories_data.json</code> - Cache otimizado (gerado automaticamente)</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="admin-section">
+                    <h4><i class="fas fa-users"></i> Estatísticas do Sistema</h4>
+                    <div id="system-stats"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        let currentStoryId = null;
+        let currentChapter = 1;
+        let currentQuiz = null;
+        let userProgress = {};
+
+        // Initialize the app
+        document.addEventListener('DOMContentLoaded', function() {
+            // Load user preferences and apply theme first
+            const preferences = JSON.parse(localStorage.getItem('userPreferences') || '{}');
+            const currentTheme = preferences.theme || 'forest';
+            applyTheme(currentTheme);
+            
+            loadStories();
+            loadUserProgress();
+            checkAdminStatus();
+        });
+
+        async function loadStories() {
+            try {
+                const response = await fetch('/api/stories');
+                const stories = await response.json();
+                displayStories(stories);
+            } catch (error) {
+                console.error('Error loading stories:', error);
+                document.getElementById('stories-container').innerHTML = 
+                    '<div class="alert alert-danger">Error loading stories. Please try again.</div>';
+            }
+        }
+
+        async function loadUserProgress() {
+            try {
+                const response = await fetch('/api/progress');
+                userProgress = await response.json();
+            } catch (error) {
+                console.error('Error loading progress:', error);
+                userProgress = {};
+            }
+        }
+
+        function displayStories(stories) {
+            const container = document.getElementById('stories-container');
+            container.innerHTML = '';
+            container.className = '';
+
+            stories.forEach(story => {
+                const storyCard = document.createElement('div');
+                storyCard.className = 'story-card';
+                storyCard.onclick = () => selectStory(story.id, story.title);
+                
+                // Check progress for this story
+                const storyKey = `story_${story.id}`;
+                const completed = userProgress.stories_completed?.[storyKey]?.chapters_completed?.length || 0;
+                const progressPercent = Math.round((completed / story.chapters) * 100);
+                
+                storyCard.innerHTML = `
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <h5 class="text-primary mb-0">${story.title}</h5>
+                        <span class="badge bg-success">${completed}/${story.chapters} chapters</span>
+                    </div>
+                    <p class="text-muted mb-3">A captivating Brazilian folktale told in ${story.chapters} chapters</p>
+                    <div class="progress mb-2" style="height: 8px;">
+                        <div class="progress-bar" style="width: ${progressPercent}%"></div>
+                    </div>
+                    <small class="text-muted">${progressPercent}% complete</small>
+                `;
+                
+                container.appendChild(storyCard);
+            });
+        }
+
+        function selectStory(storyId, storyTitle) {
+            currentStoryId = storyId;
+            document.getElementById('story-title').textContent = storyTitle;
+            
+            // Generate chapter navigation
+            displayChapterNavigation();
+            showStoryPage();
+        }
+
+        function displayChapterNavigation() {
+            const buttonsContainer = document.getElementById('chapter-buttons');
+            buttonsContainer.innerHTML = '';
+            
+            const storyKey = `story_${currentStoryId}`;
+            const completedChapters = userProgress.stories_completed?.[storyKey]?.chapters_completed || [];
+            
+            for (let i = 1; i <= 3; i++) {
+                const button = document.createElement('button');
+                button.className = 'chapter-btn';
+                button.onclick = () => loadChapter(i);
+                
+                const isCompleted = completedChapters.includes(i);
+                const isAccessible = i === 1 || completedChapters.includes(i - 1);
+                
+                if (isCompleted) {
+                    button.classList.add('completed');
+                    button.innerHTML = `<i class="fas fa-check"></i> Chapter ${i}`;
+                } else if (isAccessible) {
+                    button.innerHTML = `<i class="fas fa-play"></i> Chapter ${i}`;
+                } else {
+                    button.innerHTML = `<i class="fas fa-lock"></i> Chapter ${i}`;
+                    button.disabled = true;
+                }
+                
+                buttonsContainer.appendChild(button);
+            }
+        }
+
+        async function loadChapter(chapterNum) {
+            currentChapter = chapterNum;
+            
+            try {
+                const response = await fetch(`/api/story/${currentStoryId}/chapter/${chapterNum}`);
+                const chapter = await response.json();
+                
+                if (chapter.error) {
+                    alert('Chapter not found');
+                    return;
+                }
+                
+                // Handle new achievements from chapter reading
+                if (chapter.new_achievements) {
+                    handleNewAchievements(chapter.new_achievements);
+                }
+                
+                document.getElementById('chapter-title').textContent = chapter.title;
+                document.getElementById('story-text').innerHTML = chapter.content.replace(/\n/g, '<br><br>');
+                
+                document.getElementById('chapter-content').style.display = 'block';
+                document.getElementById('quiz-section').style.display = 'none';
+                document.getElementById('quiz-results').style.display = 'none';
+                
+                // Hide audio controls and vocabulary initially
+                document.getElementById('audio-controls').style.display = 'none';
+                document.getElementById('vocabulary-section').style.display = 'none';
+                
+            } catch (error) {
+                console.error('Error loading chapter:', error);
+                alert('Error loading chapter. Please try again.');
+            }
+        }
+
+        async function playAudio() {
+            const audioControls = document.getElementById('audio-controls');
+            const audioElement = document.getElementById('story-audio');
+            
+            audioControls.style.display = 'block';
+            audioElement.innerHTML = '<p>Loading audio...</p>';
+            
+            try {
+                // Set audio source to our API endpoint
+                audioElement.innerHTML = `
+                    <source src="/api/audio/${currentStoryId}/${currentChapter}" type="audio/mpeg">
+                    Your browser does not support the audio element.
+                `;
+                audioElement.load();
+                
+                audioElement.onloadeddata = () => {
+                    audioElement.play();
+                };
+                
+                audioElement.onerror = () => {
+                    audioElement.innerHTML = '<p class="text-warning">Audio generation failed. Please try again later.</p>';
+                };
+                
+            } catch (error) {
+                console.error('Error loading audio:', error);
+                audioElement.innerHTML = '<p class="text-danger">Error loading audio.</p>';
+            }
+        }
+
+        async function showVocabulary() {
+            if (!currentStoryId || !currentChapter) return;
+            
+            try {
+                const response = await fetch(`/api/vocabulary/${currentStoryId}/${currentChapter}`);
+                const vocabulary = await response.json();
+                
+                if (vocabulary.error || vocabulary.length === 0) {
+                    alert('No vocabulary available for this chapter.');
+                    return;
+                }
+                
+                displayVocabulary(vocabulary);
+                document.getElementById('vocabulary-section').style.display = 'block';
+                
+                // Smooth scroll to vocabulary section
+                document.getElementById('vocabulary-section').scrollIntoView({ 
+                    behavior: 'smooth', 
+                    block: 'start' 
+                });
+                
+            } catch (error) {
+                console.error('Error loading vocabulary:', error);
+                alert('Error loading vocabulary. Please try again.');
+            }
+        }
+
+        function displayVocabulary(vocabulary) {
+            const vocabularyContent = document.getElementById('vocabulary-content');
+            vocabularyContent.innerHTML = '';
+            
+            vocabulary.forEach(item => {
+                const vocabCard = document.createElement('div');
+                vocabCard.className = 'vocabulary-card';
+                vocabCard.innerHTML = `
+                    <div class="vocabulary-word">${item.word}</div>
+                    <div class="vocabulary-translation">${item.translation}</div>
+                    <div class="vocabulary-context">"${item.context}"</div>
+                `;
+                vocabularyContent.appendChild(vocabCard);
+            });
+        }
+
+        async function startQuiz() {
+            try {
+                const response = await fetch(`/api/quiz/${currentStoryId}/${currentChapter}`);
+                const quiz = await response.json();
+                
+                if (quiz.error || quiz.length === 0) {
+                    alert('No quiz available for this chapter.');
+                    return;
+                }
+                
+                currentQuiz = quiz;
+                displayQuiz();
+                
+                document.getElementById('chapter-content').style.display = 'none';
+                document.getElementById('quiz-section').style.display = 'block';
+                document.getElementById('quiz-results').style.display = 'none';
+                
+            } catch (error) {
+                console.error('Error loading quiz:', error);
+                alert('Error loading quiz. Please try again.');
+            }
+        }
+
+        function displayQuiz() {
+            const quizContent = document.getElementById('quiz-content');
+            let html = '<form id="quiz-form">';
+            
+            currentQuiz.forEach((question, index) => {
+                html += `
+                    <div class="mb-4">
+                        <h6 class="mb-3">Question ${index + 1}: ${question.question}</h6>
+                        ${question.options.map((option, optIndex) => `
+                            <div class="quiz-option" onclick="selectQuizOption(${index}, ${optIndex})">
+                                <input type="radio" name="question_${index}" value="${optIndex}" style="display: none;">
+                                <span>${String.fromCharCode(65 + optIndex)})</span> ${option}
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+            });
+            
+            html += `
+                <div class="text-center mt-4">
+                    <button type="button" class="btn btn-primary" onclick="submitQuiz()">
+                        <i class="fas fa-paper-plane"></i> Submit Answers
+                    </button>
+                </div>
+            </form>`;
+            
+            quizContent.innerHTML = html;
+        }
+
+        function selectQuizOption(questionIndex, optionIndex) {
+            const questionDiv = document.querySelector(`input[name="question_${questionIndex}"]`).closest('.mb-4');
+            const options = questionDiv.querySelectorAll('.quiz-option');
+            
+            options.forEach(opt => opt.classList.remove('selected'));
+            options[optionIndex].classList.add('selected');
+            
+            document.querySelector(`input[name="question_${questionIndex}"][value="${optionIndex}"]`).checked = true;
+        }
+
+        async function submitQuiz() {
+            const answers = [];
+            
+            for (let i = 0; i < currentQuiz.length; i++) {
+                const selectedInput = document.querySelector(`input[name="question_${i}"]:checked`);
+                if (selectedInput) {
+                    answers.push(parseInt(selectedInput.value));
+                } else {
+                    alert(`Please answer question ${i + 1}`);
+                    return;
+                }
+            }
+            
+            try {
+                const response = await fetch('/api/submit_quiz', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        story_id: currentStoryId,
+                        chapter_num: currentChapter,
+                        answers: answers
+                    })
+                });
+                
+                const result = await response.json();
+                displayQuizResults(result);
+                
+                // Update local progress
+                await loadUserProgress();
+                displayChapterNavigation();
+                
+            } catch (error) {
+                console.error('Error submitting quiz:', error);
+                alert('Error submitting quiz. Please try again.');
+            }
+        }
+
+        function displayQuizResults(result) {
+            document.getElementById('quiz-section').style.display = 'none';
+            document.getElementById('quiz-results').style.display = 'block';
+            
+            const scoreElement = document.getElementById('quiz-score');
+            const messageElement = document.getElementById('quiz-message');
+            const actionsElement = document.getElementById('quiz-actions');
+            
+            scoreElement.textContent = `${result.score}/${result.total}`;
+            scoreElement.className = `display-4 mb-3 ${result.percentage >= 70 ? 'text-success' : 'text-warning'}`;
+            
+            let message = '';
+            let messageClass = '';
+            
+            if (result.percentage >= 80) {
+                message = 'Excellent! You can advance to the next chapter!';
+                messageClass = 'text-success';
+            } else if (result.percentage >= 70) {
+                message = 'Good job! You can proceed to the next chapter.';
+                messageClass = 'text-primary';
+            } else {
+                message = 'Keep practicing! Read the chapter again and try the quiz once more.';
+                messageClass = 'text-warning';
+            }
+            
+            messageElement.innerHTML = `
+                <h5 class="${messageClass}">${message}</h5>
+                <p>You scored ${result.percentage}% (${result.score} out of ${result.total} correct)</p>
+            `;
+            
+            let actions = `
+                <button class="btn btn-secondary me-2" onclick="loadChapter(${currentChapter})">
+                    <i class="fas fa-book"></i> Read Again
+                </button>
+                <button class="btn btn-warning me-2" onclick="startQuiz()">
+                    <i class="fas fa-redo"></i> Retry Quiz
+                </button>
+            `;
+            
+            if (result.can_advance && currentChapter < 3) {
+                actions += `
+                    <button class="btn btn-success" onclick="loadChapter(${currentChapter + 1})">
+                        <i class="fas fa-forward"></i> Next Chapter
+                    </button>
+                `;
+            } else if (result.can_advance && currentChapter === 3) {
+                actions += `
+                    <button class="btn btn-primary" onclick="showHome()">
+                        <i class="fas fa-trophy"></i> Story Complete! Choose Another
+                    </button>
+                `;
+            }
+            
+            actionsElement.innerHTML = actions;
+        }
+
+        async function showStatistics() {
+            try {
+                const response = await fetch('/api/statistics');
+                const stats = await response.json();
+                await displayStatistics(stats);
+            } catch (error) {
+                console.error('Error loading statistics:', error);
+                alert('Error loading statistics.');
+                return;
+            }
+            
+            document.getElementById('welcome-page').style.display = 'none';
+            document.getElementById('home-page').style.display = 'none';
+            document.getElementById('story-page').style.display = 'none';
+            document.getElementById('statistics-page').style.display = 'block';
+            document.getElementById('ranking-page').style.display = 'none';
+            document.getElementById('admin-page').style.display = 'none';
+            document.getElementById('user-profile-page').style.display = 'none';
+        }
+
+        // Welcome page functions
+        function showWelcome() {
+            document.getElementById('welcome-page').style.display = 'block';
+            document.getElementById('home-page').style.display = 'none';
+            document.getElementById('story-page').style.display = 'none';
+            document.getElementById('statistics-page').style.display = 'none';
+            document.getElementById('ranking-page').style.display = 'none';
+            document.getElementById('admin-page').style.display = 'none';
+            document.getElementById('user-profile-page').style.display = 'none';
+            
+            // Load demo content (stories only shown when logged in)
+            // loadDemoStories(); // Commented - stories should only be visible when logged in
+            loadSampleChapter();
+        }
+
+        function showPublicLogin() {
+            // Show login modal
+            const modal = new bootstrap.Modal(document.getElementById('loginModal'));
+            modal.show();
+        }
+
+        function scrollToDemo() {
+            document.getElementById('demo-section').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        async function loadDemoStories() {
+            try {
+                const response = await fetch('/api/demo/stories');
+                const stories = await response.json();
+                
+                const container = document.getElementById('demo-stories-container');
+                let html = '';
+                
+                stories.forEach(story => {
+                    html += `
+                        <div class="col-md-6 col-lg-4">
+                            <div class="story-card">
+                                <h5><i class="fas fa-book"></i> ${story.title}</h5>
+                                <p class="story-description">${story.description}</p>
+                                <div class="story-stats">
+                                    <span><i class="fas fa-file-alt"></i> ${story.chapters} chapters</span>
+                                    <span><i class="fas fa-clock"></i> ${story.duration}</span>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                container.innerHTML = html;
+            } catch (error) {
+                console.error('Error loading demo stories:', error);
+                document.getElementById('demo-stories-container').innerHTML = `
+                    <div class="col-12">
+                        <p class="text-center">Error loading stories preview.</p>
+                    </div>
+                `;
+            }
+        }
+
+        async function loadSampleChapter() {
+            try {
+                const response = await fetch('/api/demo/sample');
+                const sample = await response.json();
+                
+                document.getElementById('sample-content').innerHTML = `
+                    <h4><i class="fas fa-book-open"></i> ${sample.title}</h4>
+                    <h5>Chapter 1: ${sample.chapter_title}</h5>
+                    <div class="mt-3">
+                        <p style="font-size: 1.1rem; line-height: 1.6;">
+                            ${sample.text}
+                        </p>
+                        <div class="mt-3">
+                            <button class="btn btn-outline-primary" disabled>
+                                <i class="fas fa-play"></i> Play Audio (Login Required)
+                            </button>
+                            <button class="btn btn-outline-secondary" disabled>
+                                <i class="fas fa-book"></i> View Vocabulary (Login Required)
+                            </button>
+                        </div>
+                    </div>
+                `;
+            } catch (error) {
+                console.error('Error loading sample chapter:', error);
+                document.getElementById('sample-content').innerHTML = `
+                    <p class="text-center">Error loading sample content.</p>
+                `;
+            }
+        }
+
+        async function displayStatistics(stats) {
+            // Story progress
+            document.getElementById('story-stats').innerHTML = `
+                <p><strong>Stories Started:</strong> ${stats.stories_started}/${stats.total_stories}</p>
+                <p><strong>Stories Finished:</strong> ${stats.stories_finished}</p>
+                <p><strong>Chapters Completed:</strong> ${stats.total_chapters_completed}</p>
+                <div class="progress mt-2" style="height: 20px;">
+                    <div class="progress-bar" style="width: ${(stats.stories_finished / stats.total_stories) * 100}%">
+                        ${Math.round((stats.stories_finished / stats.total_stories) * 100)}%
+                    </div>
+                </div>
+            `;
+            
+            // Quiz performance
+            document.getElementById('quiz-stats').innerHTML = `
+                <p><strong>Quiz Attempts:</strong> ${stats.quiz_attempts}</p>
+                <p><strong>Correct Answers:</strong> ${stats.correct_answers}</p>
+                <p><strong>Accuracy:</strong> ${stats.accuracy_percentage}%</p>
+                <div class="progress mt-2" style="height: 20px;">
+                    <div class="progress-bar ${stats.accuracy_percentage >= 80 ? 'bg-success' : stats.accuracy_percentage >= 60 ? 'bg-warning' : 'bg-danger'}" 
+                         style="width: ${stats.accuracy_percentage}%">
+                        ${stats.accuracy_percentage}%
+                    </div>
+                </div>
+            `;
+            
+            // Load achievements
+            await loadAchievements();
+            
+            // Recent activity
+            let recentHtml = '';
+            if (stats.recent_scores.length === 0) {
+                recentHtml = '<p class="text-muted">No recent activity.</p>';
+            } else {
+                stats.recent_scores.slice(0, 5).forEach(score => {
+                    const date = new Date(score.date).toLocaleDateString();
+                    recentHtml += `
+                        <div class="d-flex justify-content-between align-items-center mb-2 p-2" 
+                             style="background: rgba(34, 139, 34, 0.1); border-radius: 8px;">
+                            <span>${score.story} - ${score.chapter}</span>
+                            <span class="badge ${score.percentage >= 70 ? 'bg-success' : 'bg-warning'}">${score.percentage}%</span>
+                        </div>
+                    `;
+                });
+            }
+            document.getElementById('recent-activity').innerHTML = recentHtml;
+        }
+            
+            // Recent activity
+            let recentHtml = '';
+            if (stats.recent_scores.length === 0) {
+                recentHtml = '<p class="text-muted">No recent activity.</p>';
+            } else {
+                stats.recent_scores.slice(0, 5).forEach(score => {
+                    const date = new Date(score.date).toLocaleDateString();
+                    recentHtml += `
+                        <div class="d-flex justify-content-between align-items-center mb-2 p-2" 
+                             style="background: rgba(34, 139, 34, 0.1); border-radius: 8px;">
+                            <span>${score.story} - ${score.chapter}</span>
+                            <span class="badge ${score.percentage >= 70 ? 'bg-success' : 'bg-warning'}">${score.percentage}%</span>
+                        </div>
+                    `;
+                });
+            }
+            document.getElementById('recent-activity').innerHTML = recentHtml;
+        }
+
+        async function loadAchievements() {
+            try {
+                const response = await fetch('/api/achievements');
+                const achievements = await response.json();
+                
+                const statsResponse = await fetch('/api/achievements/stats');
+                const stats = await statsResponse.json();
+                
+                displayAchievements(achievements, stats);
+            } catch (error) {
+                console.error('Error loading achievements:', error);
+                document.getElementById('badges-container').innerHTML = '<p class="text-muted">Error loading achievements.</p>';
+            }
+        }
+
+        function displayAchievements(achievements, stats) {
+            let badgesHtml = `
+                <div class="achievement-stats mb-3">
+                    <div class="row text-center">
+                        <div class="col-4">
+                            <div class="achievement-stat">
+                                <h6>${stats.unlocked_achievements}</h6>
+                                <small>Unlocked</small>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="achievement-stat">
+                                <h6>${stats.completion_percentage}%</h6>
+                                <small>Complete</small>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="achievement-stat">
+                                <h6>${stats.total_points}</h6>
+                                <small>Points</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            const categories = {};
+            achievements.forEach(achievement => {
+                if (!categories[achievement.category]) {
+                    categories[achievement.category] = [];
+                }
+                categories[achievement.category].push(achievement);
+            });
+            
+            Object.keys(categories).forEach(category => {
+                badgesHtml += `<h6 class="text-capitalize mt-3 mb-2">${category}</h6>`;
+                categories[category].forEach(achievement => {
+                    const unlocked = achievement.unlocked;
+                    const opacity = unlocked ? '1' : '0.3';
+                    const colorClass = unlocked ? 'text-success' : 'text-muted';
+                    
+                    badgesHtml += `
+                        <div class="achievement-item mb-2 p-2" style="opacity: ${opacity}; background: rgba(34, 139, 34, 0.1); border-radius: 8px; border-left: 4px solid ${unlocked ? '#28a745' : '#6c757d'};">
+                            <div class="d-flex align-items-center">
+                                <i class="${achievement.icon} ${colorClass} me-2" style="font-size: 1.2em;"></i>
+                                <div class="flex-grow-1">
+                                    <strong>${achievement.name}</strong>
+                                    <br><small class="text-muted">${achievement.description}</small>
+                                    ${unlocked ? `<br><small class="text-success">+${achievement.points} points</small>` : ''}
+                                </div>
+                                ${unlocked ? '<i class="fas fa-check-circle text-success"></i>' : ''}
+                            </div>
+                        </div>
+                    `;
+                });
+            });
+            
+            if (achievements.length === 0) {
+                badgesHtml += '<p class="text-muted">No achievements available.</p>';
+            }
+            
+            document.getElementById('badges-container').innerHTML = badgesHtml;
+        }
+
+        function showHome() {
+            document.getElementById('welcome-page').style.display = 'none';
+            document.getElementById('home-page').style.display = 'block';
+            document.getElementById('story-page').style.display = 'none';
+            document.getElementById('statistics-page').style.display = 'none';
+            document.getElementById('ranking-page').style.display = 'none';
+            document.getElementById('admin-page').style.display = 'none';
+            document.getElementById('user-profile-page').style.display = 'none';
+            currentStoryId = null;
+            currentChapter = 1;
+            
+            // Reload stories to show updated progress
+            loadStories();
+        }
+
+        function showUserProfile() {
+            document.getElementById('welcome-page').style.display = 'none';
+            document.getElementById('home-page').style.display = 'none';
+            document.getElementById('story-page').style.display = 'none';
+            document.getElementById('statistics-page').style.display = 'none';
+            document.getElementById('ranking-page').style.display = 'none';
+            document.getElementById('admin-page').style.display = 'none';
+            document.getElementById('user-profile-page').style.display = 'block';
+            loadUserProfile();
+        }
+
+        function showRanking() {
+            document.getElementById('welcome-page').style.display = 'none';
+            document.getElementById('home-page').style.display = 'none';
+            document.getElementById('story-page').style.display = 'none';
+            document.getElementById('statistics-page').style.display = 'none';
+            document.getElementById('admin-page').style.display = 'none';
+            document.getElementById('user-profile-page').style.display = 'none';
+            document.getElementById('ranking-page').style.display = 'block';
+            loadRankingData();
+        }
+
+        function showAdmin() {
+            document.getElementById('welcome-page').style.display = 'none';
+            document.getElementById('home-page').style.display = 'none';
+            document.getElementById('story-page').style.display = 'none';
+            document.getElementById('statistics-page').style.display = 'none';
+            document.getElementById('admin-page').style.display = 'block';
+            document.getElementById('user-profile-page').style.display = 'none';
+            loadDataInfo();
+        }
+
+        async function loadDataInfo() {
+            try {
+                const response = await fetch('/api/data_info');
+                if (response.status === 403) {
+                    alert('🔒 Acesso negado. Faça login como administrador.');
+                    showLogin();
+                    return;
+                }
+                const info = await response.json();
+                displayDataStatus(info);
+            } catch (error) {
+                console.error('Error loading data info:', error);
+                document.getElementById('data-status').innerHTML = '<div class="status-error">Erro ao carregar informações</div>';
+            }
+        }
+
+        function displayDataStatus(info) {
+            let html = '<div class="status-item">';
+            html += '<span class="status-label">Histórias carregadas:</span>';
+            html += `<span class="status-value status-success">${info.stories_count}</span></div>`;
+            
+            html += '<div class="status-item">';
+            html += '<span class="status-label">Fonte dos dados:</span>';
+            html += `<span class="status-value ${info.source.includes('docx') ? 'status-warning' : 'status-success'}">${info.source}</span></div>`;
+            
+            if (info.json_exists) {
+                html += '<div class="status-item">';
+                html += '<span class="status-label">JSON atualizado em:</span>';
+                html += `<span class="status-value">${new Date(info.json_last_modified).toLocaleString('pt-BR')}</span></div>`;
+            }
+            
+            if (info.docx_exists) {
+                html += '<div class="status-item">';
+                html += '<span class="status-label">DOCX modificado em:</span>';
+                html += `<span class="status-value">${new Date(info.docx_last_modified).toLocaleString('pt-BR')}</span></div>`;
+            } else {
+                html += '<div class="status-item">';
+                html += '<span class="status-label">Arquivo DOCX:</span>';
+                html += '<span class="status-value status-error">Não encontrado</span></div>';
+            }
+            
+            document.getElementById('data-status').innerHTML = html;
+        }
+
+        async function reloadDocx() {
+            const button = event.target;
+            const originalText = button.innerHTML;
+            button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Convertendo...';
+            button.disabled = true;
+            
+            try {
+                const response = await fetch('/api/reload_docx', {
+                    method: 'POST'
+                });
+                
+                if (response.status === 403) {
+                    alert('🔒 Acesso negado. Faça login como administrador.');
+                    showLogin();
+                    return;
+                }
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    alert(`Sucesso! ${result.message}\nHistórias carregadas: ${result.stories_count}`);
+                    loadDataInfo(); // Atualiza o status
+                    loadStories(); // Recarrega as histórias na tela principal
+                } else {
+                    alert(`Erro: ${result.message}`);
+                }
+            } catch (error) {
+                console.error('Error reloading DOCX:', error);
+                alert('Erro ao reconverter DOCX');
+            } finally {
+                button.innerHTML = originalText;
+                button.disabled = false;
+            }
+        }
+
+        function downloadJson() {
+            // Abre em nova aba para download do JSON
+            const link = document.createElement('a');
+            link.href = '/download/json';
+            link.target = '_blank';
+            link.style.display = 'none';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        function showStoryPage() {
+            document.getElementById('welcome-page').style.display = 'none';
+            document.getElementById('home-page').style.display = 'none';
+            document.getElementById('story-page').style.display = 'block';
+            document.getElementById('statistics-page').style.display = 'none';
+            document.getElementById('admin-page').style.display = 'none';
+            document.getElementById('user-profile-page').style.display = 'none';
+            
+            // Hide all content sections initially
+            document.getElementById('chapter-content').style.display = 'none';
+            document.getElementById('quiz-section').style.display = 'none';
+            document.getElementById('quiz-results').style.display = 'none';
+            document.getElementById('vocabulary-section').style.display = 'none';
+        }
+
+        // Add styles for selected quiz options
+        const style = document.createElement('style');
+        style.textContent = `
+            .quiz-option.selected {
+                background: linear-gradient(145deg, #228B22 0%, #FF8C00 100%) !important;
+                color: white !important;
+                transform: translateX(5px);
+                border-color: #228B22 !important;
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Cursor changing functionality
+        function changeCursor(cursorType) {
+            const root = document.documentElement;
+            
+            if (cursorType === 'default') {
+                // Reset to default cursors
+                document.body.style.cursor = 'auto';
+                document.querySelectorAll('.story-card, .chapter-btn, .quiz-option, .nav-link, button, .btn, a, .clickable').forEach(el => {
+                    el.style.cursor = 'pointer';
+                });
+                document.querySelectorAll('input, textarea, select, .reading-area').forEach(el => {
+                    el.style.cursor = 'text';
+                });
+            } else {
+                // Set custom cursors
+                const cursorMap = {
+                    'leaf': '/static/cursor-leaf.svg',
+                    'flower': '/static/cursor-flower.svg',
+                    'star': '/static/cursor-star.svg',
+                    'magic': '/static/cursor-magic.svg'
+                };
+                
+                const cursorUrl = cursorMap[cursorType];
+                if (cursorUrl) {
+                    document.body.style.cursor = `url('${cursorUrl}') 12 12, auto`;
+                    
+                    // Apply to clickable elements
+                    document.querySelectorAll('.story-card, .chapter-btn, .quiz-option, .nav-link, button, .btn, a, .clickable').forEach(el => {
+                        el.style.cursor = `url('${cursorUrl}') 12 12, pointer`;
+                    });
+                    
+                    // Apply to text elements
+                    document.querySelectorAll('input, textarea, select, .reading-area').forEach(el => {
+                        el.style.cursor = `url('${cursorUrl}') 12 12, text`;
+                    });
+                }
+            }
+            
+            // Save preference to localStorage
+            localStorage.setItem('preferredCursor', cursorType);
+        }
+
+        // Load saved cursor preference on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            const savedCursor = localStorage.getItem('preferredCursor') || 'leaf';
+            changeCursor(savedCursor);
+        });
+
+        // Funções do perfil do usuário
+        function loadUserProfile() {
+            // Carrega dados salvos do localStorage
+            const profile = JSON.parse(localStorage.getItem('userProfile') || '{}');
+            const preferences = JSON.parse(localStorage.getItem('userPreferences') || '{}');
+            
+            // Preenche formulário de perfil
+            document.getElementById('user-name').value = profile.name || '';
+            document.getElementById('user-level').value = profile.level || 'beginner';
+            document.getElementById('user-goal').value = profile.goal || 'casual';
+            
+            // Preenche preferências
+            document.getElementById('audio-speed').value = preferences.audioSpeed || 1.0;
+            document.getElementById('speed-value').textContent = (preferences.audioSpeed || 1.0) + 'x';
+            document.getElementById('theme-preference').value = preferences.theme || 'forest';
+            document.getElementById('quiz-mode').value = preferences.quizMode || 'normal';
+            document.getElementById('daily-reminder').checked = preferences.dailyReminder || false;
+            document.getElementById('achievement-notifications').checked = preferences.achievementNotifications || true;
+            
+            // Atualiza displays
+            updateUserDisplay(profile);
+            updateProgressCircles();
+            updateVocabularyStats();
+            
+            // Event listener para slider de velocidade
+            document.getElementById('audio-speed').addEventListener('input', function(e) {
+                document.getElementById('speed-value').textContent = e.target.value + 'x';
+            });
+        }
+
+        function saveUserProfile() {
+            const profile = {
+                name: document.getElementById('user-name').value,
+                level: document.getElementById('user-level').value,
+                goal: document.getElementById('user-goal').value,
+                lastUpdated: new Date().toISOString()
+            };
+            
+            localStorage.setItem('userProfile', JSON.stringify(profile));
+            updateUserDisplay(profile);
+            
+            alert('✅ Perfil salvo com sucesso!');
+        }
+
+        function saveUserPreferences() {
+            const preferences = {
+                audioSpeed: parseFloat(document.getElementById('audio-speed').value),
+                theme: document.getElementById('theme-preference').value,
+                quizMode: document.getElementById('quiz-mode').value,
+                dailyReminder: document.getElementById('daily-reminder').checked,
+                achievementNotifications: document.getElementById('achievement-notifications').checked,
+                lastUpdated: new Date().toISOString()
+            };
+            
+            localStorage.setItem('userPreferences', JSON.stringify(preferences));
+            
+            // Aplica tema se mudou
+            applyTheme(preferences.theme);
+            
+            alert('✅ Preferências salvas com sucesso!');
+        }
+
+        function updateUserDisplay(profile) {
+            const levelDisplay = document.getElementById('user-level-display');
+            const streakDisplay = document.getElementById('user-streak');
+            
+            // Atualiza badge de nível
+            const levels = {
+                'beginner': 'Iniciante',
+                'elementary': 'Básico', 
+                'intermediate': 'Intermediário',
+                'advanced': 'Avançado'
+            };
+            
+            levelDisplay.innerHTML = `<span>Nível: ${levels[profile.level] || 'Não definido'}</span>`;
+            
+            // Calcula sequência (simulado por enquanto)
+            const streak = parseInt(localStorage.getItem('learningStreak') || '0');
+            streakDisplay.innerHTML = `<i class="fas fa-fire"></i> Sequência: ${streak} dias`;
+        }
+
+        function updateProgressCircles() {
+            // Busca estatísticas do usuário
+            fetch('/api/statistics')
+                .then(response => response.json())
+                .then(stats => {
+                    if (stats.error) return;
+                    
+                    // Histórias lidas (meta: 10 por mês)
+                    const storiesRead = stats.stories_finished || 0;
+                    updateProgressCircle('stories-progress', storiesRead, 10);
+                    
+                    // Quizzes perfeitos (meta: 5 por mês)
+                    const perfectQuizzes = (stats.recent_scores || []).filter(score => score.percentage === 100).length;
+                    updateProgressCircle('perfect-quiz-progress', perfectQuizzes, 5);
+                    
+                    // Sequência (meta: 7 dias)
+                    const streak = parseInt(localStorage.getItem('learningStreak') || '0');
+                    updateProgressCircle('streak-progress', streak, 7);
+                })
+                .catch(error => {
+                    console.error('Error loading progress:', error);
+                    // Define valores padrão em caso de erro
+                    updateProgressCircle('stories-progress', 0, 10);
+                    updateProgressCircle('perfect-quiz-progress', 0, 5);
+                    updateProgressCircle('streak-progress', 0, 7);
+                });
+        }
+
+        function updateProgressCircle(elementId, current, target) {
+            const element = document.getElementById(elementId);
+            if (!element) return;
+            
+            const percentage = Math.min((current / target) * 100, 100);
+            const degrees = (percentage / 100) * 360;
+            
+            element.style.background = `conic-gradient(#228B22 0deg ${degrees}deg, #e0e0e0 ${degrees}deg 360deg)`;
+            const textElement = element.querySelector('.progress-text');
+            if (textElement) {
+                textElement.textContent = `${current}/${target}`;
+            }
+        }
+
+        function updateVocabularyStats() {
+            // Simulação de estatísticas de vocabulário
+            const vocabData = JSON.parse(localStorage.getItem('vocabularyStats') || '{"total": 0, "mastered": 0, "review": 0, "newToday": 0}');
+            
+            document.getElementById('total-words').textContent = vocabData.total || 0;
+            document.getElementById('mastered-words').textContent = vocabData.mastered || 0;
+            document.getElementById('review-words').textContent = vocabData.review || 0;
+            document.getElementById('new-words').textContent = vocabData.newToday || 0;
+        }
+
+        function applyTheme(theme) {
+            // Aplica temas visuais diferentes
+            const body = document.body;
+            const navbar = document.querySelector('.navbar');
+            
+            const gradients = {
+                'forest': 'linear-gradient(135deg, #228B22 0%, #FF8C00 30%, #32CD32 70%, #DAA520 100%)',
+                'ocean': 'linear-gradient(135deg, #1e3c72 0%, #2a5298 30%, #87CEEB 70%, #4682B4 100%)',
+                'sunset': 'linear-gradient(135deg, #FF6B6B 0%, #FF8E53 30%, #FF6B9D 70%, #845EC2 100%)',
+                'classic': 'linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%)'
+            };
+            
+            const navbarColors = {
+                'forest': 'rgba(34, 139, 34, 0.9)',
+                'ocean': 'rgba(30, 60, 114, 0.9)',
+                'sunset': 'rgba(255, 107, 107, 0.9)',
+                'classic': 'rgba(102, 126, 234, 0.9)'
+            };
+            
+            if (gradients[theme]) {
+                body.style.background = gradients[theme];
+            }
+            
+            if (navbar && navbarColors[theme]) {
+                // Usar setProperty para aplicar !important
+                navbar.style.setProperty('background', navbarColors[theme], 'important');
+            }
+        }
+
+        function startVocabReview() {
+            alert('🎯 Funcionalidade de revisão de vocabulário em desenvolvimento!\n\nEm breve você poderá:\n• Revisar palavras aprendidas\n• Fazer flashcards\n• Testar conhecimento');
+        }
+
+        function exportProgress() {
+            try {
+                const progress = {
+                    profile: JSON.parse(localStorage.getItem('userProfile') || '{}'),
+                    preferences: JSON.parse(localStorage.getItem('userPreferences') || '{}'),
+                    vocabulary: JSON.parse(localStorage.getItem('vocabularyStats') || '{}'),
+                    exportDate: new Date().toISOString()
+                };
+                
+                const dataStr = JSON.stringify(progress, null, 2);
+                const dataBlob = new Blob([dataStr], {type: 'application/json'});
+                
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(dataBlob);
+                link.download = `meu_progresso_${new Date().toISOString().split('T')[0]}.json`;
+                link.click();
+                
+                alert('📥 Progresso exportado com sucesso!');
+            } catch (error) {
+                console.error('Export error:', error);
+                alert('❌ Erro ao exportar progresso');
+            }
+        }
+
+        function resetProgress() {
+            if (!confirm('⚠️ Tem certeza que deseja resetar todo o seu progresso?\n\nEsta ação não pode ser desfeita!')) {
+                return;
+            }
+            
+            if (!confirm('🔄 Confirma que deseja resetar:\n• Estatísticas de aprendizado\n• Progresso de histórias\n• Sequência de dias\n• Dados de vocabulário?')) {
+                return;
+            }
+            
+            try {
+                // Remove dados específicos do progresso
+                localStorage.removeItem('vocabularyStats');
+                localStorage.removeItem('learningStreak');
+                localStorage.removeItem('lastActivity');
+                
+                // Recarrega a página para limpar progresso
+                alert('🔄 Progresso resetado! A página será recarregada.');
+                window.location.reload();
+            } catch (error) {
+                console.error('Reset error:', error);
+                alert('❌ Erro ao resetar progresso');
+            }
+        }
+
+        // Funções de autenticação
+        async function checkAdminStatus() {
+            try {
+                const response = await fetch('/api/auth_status');
+                const authData = await response.json();
+                
+                if (authData.authenticated) {
+                    // User is authenticated
+                    document.getElementById('public-menu').style.setProperty('display', 'none', 'important');
+                    document.getElementById('user-menu').style.setProperty('display', 'flex', 'important');
+                    document.body.classList.add('authenticated');
+                    
+                    // Show demo stories section and load them
+                    const demoStoriesSection = document.querySelector('.demo-stories');
+                    if (demoStoriesSection) {
+                        demoStoriesSection.style.display = 'block';
+                        loadDemoStories(); // Load stories only when authenticated
+                    }
+                    
+                    // Update admin link visibility and username
+                    const adminLink = document.getElementById('admin-link');
+                    const usernameSpan = document.getElementById('current-username');
+                    
+                    if (authData.is_admin) {
+                        adminLink.style.display = 'block';
+                    } else {
+                        adminLink.style.display = 'none';
+                    }
+                    
+                    if (usernameSpan && authData.username) {
+                        usernameSpan.textContent = authData.username;
+                    }
+                    
+                    // Navigate to home page if currently on welcome
+                    if (document.getElementById('welcome-page').style.display !== 'none') {
+                        showHome();
+                    }
+                } else {
+                    // User not authenticated - force hide user menu and show public menu
+                    document.getElementById('public-menu').style.setProperty('display', 'flex', 'important');
+                    document.getElementById('user-menu').style.setProperty('display', 'none', 'important');
+                    document.body.classList.remove('authenticated');
+                    
+                    // Hide demo stories section when not authenticated
+                    const demoStoriesSection = document.querySelector('.demo-stories');
+                    if (demoStoriesSection) {
+                        demoStoriesSection.style.display = 'none';
+                    }
+                    
+                    showWelcome();
+                }
+            } catch (error) {
+                console.error('Error checking auth status:', error);
+                // Default to welcome page on error and ensure proper menu visibility
+                document.getElementById('public-menu').style.setProperty('display', 'flex', 'important');
+                document.getElementById('user-menu').style.setProperty('display', 'none', 'important');
+                document.body.classList.remove('authenticated');
+                showWelcome();
+            }
+        }
+
+        function showLogin() {
+            const modal = new bootstrap.Modal(document.getElementById('loginModal'));
+            modal.show();
+            
+            // Limpa campos
+            document.getElementById('username').value = '';
+            document.getElementById('password').value = '';
+            document.getElementById('loginError').style.display = 'none';
+        }
+
+        async function doLogin() {
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value;
+            const errorDiv = document.getElementById('loginError');
+
+            if (!username || !password) {
+                errorDiv.textContent = 'Por favor, preencha todos os campos.';
+                errorDiv.style.display = 'block';
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ username, password })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    // Login bem-sucedido
+                    window.currentUsername = result.username; // Store username for ranking
+                    bootstrap.Modal.getInstance(document.getElementById('loginModal')).hide();
+                    checkAdminStatus(); // Atualiza UI e navega para home
+                    
+                    const welcomeMessage = result.is_admin ? 
+                        `✅ Bem-vindo, ${result.username}! Acesso de administrador concedido.` :
+                        `✅ Bem-vindo, ${result.username}! Login realizado com sucesso.`;
+                    alert(welcomeMessage);
+                } else {
+                    // Login falhou
+                    errorDiv.textContent = result.message;
+                    errorDiv.style.display = 'block';
+                }
+            } catch (error) {
+                console.error('Login error:', error);
+                errorDiv.textContent = 'Erro de conexão. Tente novamente.';
+                errorDiv.style.display = 'block';
+            }
+        }
+
+        async function doLogout() {
+            if (!confirm('Tem certeza que deseja sair?')) {
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/logout', {
+                    method: 'POST'
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    // Update UI and return to welcome page
+                    document.getElementById('public-menu').style.setProperty('display', 'flex', 'important');
+                    document.getElementById('user-menu').style.setProperty('display', 'none', 'important');
+                    document.body.classList.remove('authenticated');
+                    
+                    // Hide demo stories section
+                    const demoStoriesSection = document.querySelector('.demo-stories');
+                    if (demoStoriesSection) {
+                        demoStoriesSection.style.display = 'none';
+                    }
+                    
+                    showWelcome();
+                    alert('✅ Logout realizado com sucesso.');
+                } else {
+                    alert('Erro ao fazer logout.');
+                }
+            } catch (error) {
+                console.error('Logout error:', error);
+                // Force menu reset even on error
+                document.getElementById('public-menu').style.setProperty('display', 'flex', 'important');
+                document.getElementById('user-menu').style.setProperty('display', 'none', 'important');
+                document.body.classList.remove('authenticated');
+                showWelcome();
+                alert('Erro de conexão ao fazer logout.');
+            }
+        }
+
+        // Detecta Enter no modal de login
+        document.addEventListener('DOMContentLoaded', function() {
+            const loginModal = document.getElementById('loginModal');
+            loginModal.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    doLogin();
+                }
+            });
+        });
+
+        // Initial page setup
+        document.addEventListener('DOMContentLoaded', function() {
+            checkInitialAuth();
+        });
+
+        async function checkInitialAuth() {
+            try {
+                const response = await fetch('/api/auth_status');
+                const authData = await response.json();
+                
+                if (authData.authenticated) {
+                    // User is authenticated, show home page
+                    document.getElementById('public-menu').style.display = 'none';
+                    document.getElementById('user-menu').style.display = 'block';
+                    document.body.classList.add('authenticated');
+                    showHome();
+                } else {
+                    // User not authenticated, show welcome page
+                    document.getElementById('public-menu').style.display = 'block';
+                    document.getElementById('user-menu').style.display = 'none';
+                    document.body.classList.remove('authenticated');
+                    showWelcome();
+                }
+            } catch (error) {
+                console.error('Error checking auth status:', error);
+                // Default to welcome page on error
+                showWelcome();
+            }
+        }
+
+        // Achievement Notification Functions
+        function showAchievementNotification(achievement) {
+            const preferences = JSON.parse(localStorage.getItem('userPreferences') || '{}');
+            if (!preferences.achievementNotifications) return;
+            
+            const container = document.getElementById('achievement-notifications');
+            const notificationId = 'achievement-' + Date.now();
+            
+            const notification = document.createElement('div');
+            notification.id = notificationId;
+            notification.className = 'achievement-notification';
+            notification.style.cssText = `
+                background: linear-gradient(135deg, #28a745, #20c997);
+                color: white;
+                padding: 15px;
+                border-radius: 10px;
+                margin-bottom: 10px;
+                box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+                transform: translateX(400px);
+                transition: all 0.3s ease;
+                border-left: 4px solid #fff;
+            `;
+            
+            notification.innerHTML = `
+                <div class="d-flex align-items-center">
+                    <i class="${achievement.icon} me-3" style="font-size: 2em;"></i>
+                    <div class="flex-grow-1">
+                        <h6 class="mb-1">🏆 Achievement Unlocked!</h6>
+                        <strong>${achievement.name}</strong>
+                        <br><small>${achievement.description}</small>
+                        <br><small class="opacity-75">+${achievement.points} points</small>
+                    </div>
+                </div>
+            `;
+            
+            container.appendChild(notification);
+            
+            // Animate in
+            setTimeout(() => {
+                notification.style.transform = 'translateX(0)';
+            }, 100);
+            
+            // Auto remove after 5 seconds
+            setTimeout(() => {
+                notification.style.transform = 'translateX(400px)';
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        notification.parentNode.removeChild(notification);
+                    }
+                }, 300);
+            }, 5000);
+        }
+
+        function handleNewAchievements(achievements) {
+            if (!achievements || achievements.length === 0) return;
+            
+            achievements.forEach((achievement, index) => {
+                setTimeout(() => {
+                    showAchievementNotification(achievement);
+                }, index * 1000); // Stagger multiple achievements
+            });
+        }
+
+        // Override existing quiz submission to handle achievements
+        const originalSubmitQuiz = submitQuiz;
+        async function submitQuiz() {
+            const result = await originalSubmitQuiz();
+            if (result && result.new_achievements) {
+                handleNewAchievements(result.new_achievements);
+            }
+            return result;
+        }
+
+        // Ranking Functions
+        async function loadRankingData() {
+            try {
+                // Load user's rank
+                await loadUserRank();
+                
+                // Load global ranking (default top 25)
+                await loadGlobalRanking(25);
+                
+                // Load category rankings (default reading)
+                await loadCategoryRankings();
+                showCategoryRanking('reading');
+            } catch (error) {
+                console.error('Error loading ranking data:', error);
+            }
+        }
+
+        async function loadUserRank() {
+            try {
+                const response = await fetch('/api/ranking/user');
+                const userRank = await response.json();
+                
+                const userRankElement = document.getElementById('user-rank-info');
+                if (userRank && userRank.rank) {
+                    userRankElement.innerHTML = `
+                        <div class="rank-badge">#${userRank.rank}</div>
+                        <div class="rank-details">
+                            <div class="rank-name">${userRank.username}</div>
+                            <div class="rank-points">${userRank.total_points} points • ${userRank.achievements_count} achievements</div>
+                        </div>
+                    `;
+                } else {
+                    userRankElement.innerHTML = `
+                        <div class="rank-badge">-</div>
+                        <div class="rank-details">
+                            <div class="rank-name">Not ranked yet</div>
+                            <div class="rank-points">Complete achievements to get ranked!</div>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                console.error('Error loading user rank:', error);
+            }
+        }
+
+        async function loadGlobalRanking(limit = 25) {
+            try {
+                const response = await fetch(`/api/ranking/global?limit=${limit}`);
+                const ranking = await response.json();
+                
+                const rankingList = document.getElementById('global-ranking-list');
+                
+                if (!ranking || ranking.length === 0) {
+                    rankingList.innerHTML = '<div class="text-center p-3">No rankings available yet. Be the first to earn achievements!</div>';
+                    return;
+                }
+                
+                let html = '';
+                ranking.forEach((user, index) => {
+                    const isCurrentUser = user.username === getCurrentUsername(); // You'll need to implement this
+                    const isTop3 = index < 3;
+                    
+                    let rankClass = '';
+                    if (isCurrentUser) rankClass += ' current-user';
+                    if (isTop3) rankClass += ' top-3';
+                    
+                    let positionClass = '';
+                    if (index === 0) positionClass = 'gold';
+                    else if (index === 1) positionClass = 'silver';
+                    else if (index === 2) positionClass = 'bronze';
+                    
+                    html += `
+                        <div class="ranking-item${rankClass}">
+                            <div class="rank-position ${positionClass}">${user.rank}</div>
+                            <div class="rank-user-info">
+                                <div class="rank-username">${user.username}</div>
+                                <div class="rank-stats">${user.achievements_count} achievements</div>
+                            </div>
+                            <div class="rank-score">${user.total_points} pts</div>
+                        </div>
+                    `;
+                });
+                
+                rankingList.innerHTML = html;
+                
+                // Update button states
+                document.querySelectorAll('.ranking-controls .btn').forEach(btn => {
+                    btn.classList.remove('btn-primary');
+                    btn.classList.add('btn-outline-primary');
+                });
+                
+                const activeBtn = document.querySelector(`[onclick="loadGlobalRanking(${limit})"]`);
+                if (activeBtn) {
+                    activeBtn.classList.remove('btn-outline-primary');
+                    activeBtn.classList.add('btn-primary');
+                }
+            } catch (error) {
+                console.error('Error loading global ranking:', error);
+            }
+        }
+
+        let categoryRankings = {};
+        
+        async function loadCategoryRankings() {
+            try {
+                const response = await fetch('/api/ranking/categories');
+                categoryRankings = await response.json();
+            } catch (error) {
+                console.error('Error loading category rankings:', error);
+            }
+        }
+
+        function showCategoryRanking(category) {
+            // Update tab states
+            document.querySelectorAll('.category-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            const activeTab = document.querySelector(`[data-category="${category}"]`);
+            if (activeTab) {
+                activeTab.classList.add('active');
+            }
+            
+            // Show category ranking
+            const categoryList = document.getElementById('category-ranking-list');
+            const rankings = categoryRankings[category];
+            
+            if (!rankings || rankings.length === 0) {
+                categoryList.innerHTML = '<div class="text-center p-2">No achievements in this category yet.</div>';
+                return;
+            }
+            
+            let html = '';
+            rankings.slice(0, 5).forEach((user) => {
+                html += `
+                    <div class="mini-ranking-item">
+                        <div class="mini-rank-pos">#${user.rank}</div>
+                        <div class="mini-rank-name">${user.username}</div>
+                        <div class="mini-rank-points">${user.points} pts</div>
+                    </div>
+                `;
+            });
+            
+            categoryList.innerHTML = html;
+        }
+
+        function getCurrentUsername() {
+            // This should be set when user logs in
+            return window.currentUsername || 'Unknown';
+        }
+    </script>
+</body>
+</html>

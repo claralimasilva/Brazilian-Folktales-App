@@ -1,0 +1,114 @@
+{
+  "stories": {
+    "1": {
+      "id": 1,
+      "title": "STORY 1: The Legend of Saci",
+      "chapters": {
+        "1": {
+          "title": "Chapter 1: The Forest Trickster",
+          "content": "Once upon a time, deep in the forests of Brazil, there lived a strange little creature named Saci. He had only one leg, wore a red magical cap, and always smoked a small pipe. Saci was fast like the wind and loved to play tricks on people.\nHe tied knots in horses' manes, stole kitchen salt, and hid children's toys. People in the village were always confused. “Who took my boots?” one man asked. “Where is my hat?” cried another. The answer was always the same: “It must be Saci!”\nBut no one had ever seen him—only the little red tornado that appeared and disappeared.\n",
+          "quiz": [],
+          "vocabulary": [
+            {
+              "word": "Forest",
+              "translation": "floresta",
+              "context": "Used in the context of this chapter."
+            },
+            {
+              "word": "Creature",
+              "translation": "criatura",
+              "context": "Used in the context of this chapter."
+            },
+            {
+              "word": "Pipe",
+              "translation": "cachimbo",
+              "context": "Used in the context of this chapter."
+            },
+            {
+              "word": "Tricks",
+              "translation": "travessuras",
+              "context": "Used in the context of this chapter."
+            },
+            {
+              "word": "Hide",
+              "translation": "seconder",
+              "context": "Used in the context of this chapter."
+            }
+          ]
+        },
+        "2": {
+          "title": "Chapter 2 – The Boy Named Pedro",
+          "content": "One day, a boy named Pedro heard the stories about Saci. He was brave and curious. “I want to catch Saci!” he said.\n\nPedro went into the forest with a glass jar and a sieve. His grandmother told him, “To catch a Saci, you must take his red cap!”\n\nPedro walked quietly and waited near a big tree. Then, he saw the red tornado spinning! With quick hands, Pedro threw the sieve in the air—and the Saci fell into the jar!\n\nThe Saci looked angry. “Let me go!” he said. Pedro smiled. “Not until I learn your secrets.”\n",
+          "quiz": [],
+          "vocabulary": [
+            {
+              "word": "Brave",
+              "translation": "corajoso",
+              "context": "Used in the context of this chapter."
+            },
+            {
+              "word": "Curious",
+              "translation": "curioso",
+              "context": "Used in the context of this chapter."
+            },
+            {
+              "word": "Jar",
+              "translation": "pote",
+              "context": "Used in the context of this chapter."
+            },
+            {
+              "word": "Sieve",
+              "translation": "peneira",
+              "context": "Used in the context of this chapter."
+            },
+            {
+              "word": "Secrets",
+              "translation": "segredos",
+              "context": "Used in the context of this chapter."
+            }
+          ]
+        },
+        "3": {
+          "title": "Chapter 3 – A Deal with Saci",
+          "content": "Pedro took the jar home. Saci sat inside, arms crossed, looking grumpy. Pedro asked, “Why do you hide things?”\n\nSaci said, “I am the guardian of the forest. I only play with people who forget to respect nature.”\n\nPedro was surprised. “I didn’t know that,” he said.\n\nSaci smiled. “If you promise to protect the trees and animals, I will let you use my magic cap… sometimes.”\n\nPedro agreed. He opened the jar. Saci jumped out, did a flip in the air, and disappeared into a red swirl. From that day, Pedro never forgot to care for the forest.\n",
+          "quiz": [],
+          "vocabulary": [
+            {
+              "word": "Deal",
+              "translation": "acordo",
+              "context": "Used in the context of this chapter."
+            },
+            {
+              "word": "Respect",
+              "translation": "respeitar",
+              "context": "Used in the context of this chapter."
+            },
+            {
+              "word": "Guardian",
+              "translation": "guardião",
+              "context": "Used in the context of this chapter."
+            },
+            {
+              "word": "Promise",
+              "translation": "prometer",
+              "context": "Used in the context of this chapter."
+            },
+            {
+              "word": "Care for",
+              "translation": "cuidar de",
+              "context": "Used in the context of this chapter."
+            }
+          ]
+        }
+      },
+      "total_chapters": 3
+    }
+  },
+  "conversion_info": {
+    "conversion_timestamp": "2025-08-21T15:27:48.553949",
+    "source_file": "BrazilianFolktales.docx",
+    "stories_count": 1,
+    "docx_last_modified": "2025-08-21T15:22:47.733469"
+  },
+  "version": "2.0"
+}
