@@ -11,6 +11,8 @@
 
 Interactive web application for reading Brazilian folk tales with complete gamification system through achievements and rankings. Built with Flask featuring responsive interface and SQLite database.
 
+This project was developed as part of an extension scholarship from PREX (Pro-Reitoria de Extensão da Universidade Federal do Ceará) at Casa de Cultura Britânica. Its main goal is to help users learn English through interactive reading of Brazilian folktales, using gamification and ranking systems.
+
 ## **Main Features**
 
 ### **Reading System**
