@@ -218,13 +218,3 @@ export FLASK_ENV=production
 3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
 4. Push to the branch (`git push origin feature/AmazingFeature`)
 5. Open a Pull Request
-
-## **License**
-
-This project is under the MIT license. See `LICENSE` for more details.
-
-## **Developed by**
-
-**Your Name** - [GitHub](https://github.com/your-username) - [Email](mailto:your@email.com)
-
----
